@@ -6,6 +6,7 @@ import { Database, SearchIcon, Code, TrendingUp } from "lucide-react"
 import SearchBar from "@/components/SearchBar"
 import SearchResultCard from "@/components/SearchResultCard"
 import SwaggerModal from "@/components/SwaggerModal"
+import PingTest from "@/components/PingTest";
 import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
@@ -81,6 +82,7 @@ const HomePage: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!query && <PingTest />}
         {/* 검색 영역 */}
         <div className="text-center mb-12">
           {!query && (
