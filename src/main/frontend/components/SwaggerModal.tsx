@@ -13,6 +13,63 @@ interface SwaggerModalProps {
 
 const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) => {
     const [apiMethods, setApiMethods] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+  // Swagger API 문서 데이터를 비동기로 가져오는 함수
+  const fetchSwaggerData = async () => {
+    // swaggerUrl이 없으면 함수 종료
+    if (!result?.swaggerUrl) return
+
+    // 로딩 시작, 에러 초기화
+    setLoading(true)
+    setError(null)
+
+    try {
+      // swaggerUrl로부터 JSON 데이터 fetch
+      const res = await fetch(result.swaggerUrl)
+
+      // HTTP 응답 상태가 OK가 아니면 에러 발생시키기
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+
+      const data = await res.json()
+      const paths = data.paths
+
+      const methods = []
+
+      // paths 객체 안의 각 경로(path)와 HTTP 메서드(method)를 순회
+      for (const path in paths) {
+        for (const method in paths[path]) {
+          const info = paths[path][method]
+          methods.push({
+            method: method.toUpperCase(),       // GET, POST 등 대문자 변환
+            path,                                // API 경로
+            summary: info.summary || "",         // 요약 정보 없으면 빈 문자열
+            description: info.description || "", // 설명 정보 없으면 빈 문자열
+          })
+        }
+      }
+
+      // 상태에 API 메서드 목록 저장
+      setApiMethods(methods)
+    } catch (error) {
+      // 에러 발생 시 에러 메시지 상태에 저장 및 apiMethods 초기화
+      setError("API 문서 로드 실패")
+      setApiMethods([])
+      console.error("Swagger JSON fetch error:", error)
+    } finally {
+      // 로딩 종료
+      setLoading(false)
+    }
+  }
+
+  // 모달이 열리고 swaggerUrl이 있을 때만 fetch 함수 호출
+  if (isOpen && result?.swaggerUrl) {
+    fetchSwaggerData()
+  }
+}, [isOpen, result?.swaggerUrl])
+
 
   if (!isOpen || !result || !result.swaggerUrl) return null
 
@@ -43,40 +100,7 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
     }
   }
 
-  useEffect(() => {
-  const fetchSwaggerData = async () => {
-    if (!result?.swaggerUrl) return
 
-    try {
-      const res = await fetch(result.swaggerUrl)
-      const data = await res.json()
-      const paths = data.paths
-
-      const methods = []
-
-      for (const path in paths) {
-        for (const method in paths[path]) {
-          const info = paths[path][method]
-          methods.push({
-            method: method.toUpperCase(),
-            path,
-            summary: info.summary || "",
-            description: info.description || "",
-          })
-        }
-      }
-
-      setApiMethods(methods)
-    } catch (error) {
-      console.error("Swagger JSON fetch error:", error)
-      setApiMethods([])
-    }
-  }
-
-  if (isOpen && result?.swaggerUrl) {
-    fetchSwaggerData()
-  }
-}, [isOpen, result?.swaggerUrl])
 
   return (
     <div
@@ -143,6 +167,10 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
               <Code className="w-5 h-5 text-blue-600" />
               API 메서드
             </h3>
+
+            {loading && <p className="text-center text-gray-500">로딩 중...</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
+
             <div className="space-y-3">
               {apiMethods.map((api, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
