@@ -23,7 +23,7 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
   // Swagger API 문서 데이터를 비동기로 가져오는 함수
   const fetchSwaggerData = async () => {
     // swaggerUrl이 없으면 함수 종료
-    if (!result?.swaggerUrl) return
+   if (!result?.swaggerUrl || !isOpen) return; // :흰색_확인_표시: 여기서 조건
 
     // 로딩 시작, 에러 초기화
     setLoading(true)
@@ -63,15 +63,11 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
       console.error("Swagger JSON fetch error:", error)
     } finally {
       // 로딩 종료
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  // 모달이 열리고 swaggerUrl이 있을 때만 fetch 함수 호출(Swagger API 문서 불러오기)
-  if (isOpen && result?.swaggerUrl) {
-    fetchSwaggerData()
-  }
-}, [isOpen, result?.swaggerUrl])
+  };
+   fetchSwaggerData(); // :흰색_확인_표시: 항상 호출되지만 내부에서 조건 체크함
+}, [isOpen, result?.swaggerUrl]);
 
 
   /** 여기가 CORS 중계구조 장치.
