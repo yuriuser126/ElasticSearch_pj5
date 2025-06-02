@@ -12,14 +12,102 @@ interface SwaggerModalProps {
 }
 
 const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) => {
-    const [apiMethods, setApiMethods] = useState<any[]>([])
+  // 상태: API 메서드 리스트
+  const [apiMethods, setApiMethods] = useState<any[]>([])
+  // 상태: 로딩 여부
+  const [loading, setLoading] = useState(false)
+  // 상태: 에러 메시지
+  const [error, setError] = useState<string | null>(null)
+  
+  useEffect(() => {
+  // Swagger API 문서 데이터를 비동기로 가져오는 함수
+  const fetchSwaggerData = async () => {
+    // swaggerUrl이 없으면 함수 종료
+    if (!result?.swaggerUrl) return
+
+    // 로딩 시작, 에러 초기화
+    setLoading(true)
+    setError(null)
+
+    try {
+      // swaggerUrl로부터 JSON 데이터 fetch
+      const res = await fetch(result.swaggerUrl)
+
+      // HTTP 응답 상태가 OK가 아니면 에러 발생시키기
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+
+      const data = await res.json()
+      const paths = data.paths
+
+      const methods = []
+
+      // paths 객체 안의 각 경로(path)와 HTTP 메서드(method)를 순회
+      for (const path in paths) {
+        for (const method in paths[path]) {
+          const info = paths[path][method]
+          methods.push({
+            method: method.toUpperCase(),       // GET, POST 등 대문자 변환
+            path,                                // API 경로
+            summary: info.summary || "",         // 요약 정보 없으면 빈 문자열
+            description: info.description || "", // 설명 정보 없으면 빈 문자열
+          })
+        }
+      }
+
+      // 상태에 API 메서드 목록 저장
+      setApiMethods(methods)
+    } catch (error) {
+      // 에러 발생 시 에러 메시지 상태에 저장 및 apiMethods 초기화
+      setError("API 문서 로드 실패")
+      setApiMethods([])
+      console.error("Swagger JSON fetch error:", error)
+    } finally {
+      // 로딩 종료
+      setLoading(false)
+    }
+  }
+
+  // 모달이 열리고 swaggerUrl이 있을 때만 fetch 함수 호출(Swagger API 문서 불러오기)
+  if (isOpen && result?.swaggerUrl) {
+    fetchSwaggerData()
+  }
+}, [isOpen, result?.swaggerUrl])
+
+
+  /** 여기가 CORS 중계구조 장치.
+   * 프록시 서버를 통해 외부 API 호출 예시 함수
+   * - 실제 호출 시 외부 URL을 encodeURIComponent로 인코딩하여 전달
+   * - 에러 처리 포함
+   * - 이 함수는 UI 버튼에 연결하여 테스트 가능
+   */
+  const fetchDataViaProxy = async () => {
+    try {
+      const externalApiUrl = 'https://apis.data.go.kr/B551011/your-api-path?serviceKey=YOUR_SERVICE_KEY&param=value'
+
+      // 프록시 서버에 외부 URL을 쿼리파라미터로 넘김 (URL 인코딩 필수)
+      const proxyUrl = '/api/proxy/external?url=' + encodeURIComponent(externalApiUrl)
+
+      const response = await fetch(proxyUrl)
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+
+      const data = await response.json()
+      console.log('프록시 서버를 통해 받은 데이터:', data)
+      alert("프록시 호출 성공, 콘솔 확인하세요.")
+    } catch (err) {
+      console.error('프록시 호출 에러:', err)
+      alert("프록시 호출 실패")
+    }
+  }
+
 
   if (!isOpen || !result || !result.swaggerUrl) return null
 
+  // Swagger UI 새 창으로 열기
   const handleExternalSwagger = () => {
     window.open(result.swaggerUrl, "_blank", "noopener,noreferrer")
   }
 
+  // 모달 바깥 클릭 시 닫기
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose()
@@ -28,6 +116,7 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
 
  
 
+  // HTTP 메서드별로 색상 스타일 반환
   const getMethodColor = (method: string) => {
     switch (method) {
       case "GET":
@@ -43,40 +132,31 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
     }
   }
 
-  useEffect(() => {
-  const fetchSwaggerData = async () => {
-    if (!result?.swaggerUrl) return
 
-    try {
-      const res = await fetch(result.swaggerUrl)
-      const data = await res.json()
-      const paths = data.paths
+  /** 
+ * [프록시 API를 통해 swaggerUrl 데이터 불러오기 / 중계구조 CORS]
+ * - 외부 API를 직접 호출하지 않고, Next.js API 라우트를 통해 우회 호출
+ * - CORS 회피 목적 (서버 측에서 외부 API를 대신 호출)
+ * - 실제 배포 시에도 보안과 통신 안전성을 위해 유용
+ * - 테스트용 URL은 예시이며 실제로는 각 API마다 다르게 구성됨
+ */
+// const fetchSwaggerData = async () => {
+//   if (!result?.swaggerUrl) return
 
-      const methods = []
+//   try {
+//     const proxyUrl = `/api/proxy?url=${encodeURIComponent(result.swaggerUrl)}`
+//     const response = await fetch(proxyUrl)
+//     const json = await response.json()
 
-      for (const path in paths) {
-        for (const method in paths[path]) {
-          const info = paths[path][method]
-          methods.push({
-            method: method.toUpperCase(),
-            path,
-            summary: info.summary || "",
-            description: info.description || "",
-          })
-        }
-      }
+//     console.log('Swagger JSON:', json) // 확인용
 
-      setApiMethods(methods)
-    } catch (error) {
-      console.error("Swagger JSON fetch error:", error)
-      setApiMethods([])
-    }
-  }
+//   } catch (err) {
+//     console.error('Swagger fetch error:', err)
+//   }
+// }
 
-  if (isOpen && result?.swaggerUrl) {
-    fetchSwaggerData()
-  }
-}, [isOpen, result?.swaggerUrl])
+
+
 
   return (
     <div
@@ -143,6 +223,10 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
               <Code className="w-5 h-5 text-blue-600" />
               API 메서드
             </h3>
+
+            {loading && <p className="text-center text-gray-500">로딩 중...</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
+
             <div className="space-y-3">
               {apiMethods.map((api, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -184,12 +268,19 @@ fetch('${result.apiEndpoint}/api/v1/data', {
           {/* 액션 버튼 */}
           <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
+              onClick={fetchDataViaProxy}
+              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
+            >
+              🚀 프록시 호출 테스트 (콘솔 확인)
+            </button>
+            <button
               onClick={handleExternalSwagger}
               className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
             >
               <ExternalLink className="w-4 h-4" />
               전체 Swagger 문서 보기
             </button>
+            
             <button
               onClick={() => window.open(result.url, "_blank", "noopener,noreferrer")}
               className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"

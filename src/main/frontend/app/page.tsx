@@ -9,6 +9,7 @@ import SwaggerModal from "@/components/SwaggerModal"
 import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
+import { History } from "lucide-react";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -68,7 +69,7 @@ const HomePage: React.FC = () => {
                     onClick={() => setCurrentView("history")}
                     className="flex items-center gap-2"
                   >
-                    {/* <History className="h-4 w-4" /> */}
+                    <History className="h-4 w-4" />
                     수집 이력
                   </Button>
 
