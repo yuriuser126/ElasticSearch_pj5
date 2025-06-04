@@ -1,4 +1,4 @@
-# 🔐 보안 및 배포 작업 브랜치 - feature/chaeyoon-security
+# 작업 브랜치 - feature/chaeyoon-security
 
 ## 📌 작업 목표
 - Spring Security 설정
