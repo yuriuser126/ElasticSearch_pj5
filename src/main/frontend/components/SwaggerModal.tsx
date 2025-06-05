@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { Zap, Download } from 'lucide-react'
 import { useEffect, useState } from "react" 
 import { X, ExternalLink, Code, FileText, Globe } from "lucide-react"
 import type { SearchResult } from "@/types"
@@ -10,6 +11,7 @@ interface SwaggerModalProps {
   isOpen: boolean
   onClose: () => void
 }
+
 
 const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) => {
   // 상태: API 메서드 리스트
@@ -32,6 +34,8 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
     try {
       // swaggerUrl로부터 JSON 데이터 fetch
       const res = await fetch(result.swaggerUrl)
+      result.swaggerUrl = "http://localhost:8485/v3/api-docs"
+      // result.swaggerUrl = "http://13.209.74.214:8080/v3/api-docs"
 
       // HTTP 응답 상태가 OK가 아니면 에러 발생시키기
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
@@ -261,33 +265,57 @@ fetch('${result.apiEndpoint}/api/v1/data', {
             </div>
           </div>
 
-          {/* 액션 버튼 */}
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={fetchDataViaProxy}
-              className="mt-4 px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors"
-            >
-              🚀 프록시 호출 테스트 (콘솔 확인)
-            </button>
-            <button
-              onClick={handleExternalSwagger}
-              className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              전체 Swagger 문서 보기
-            </button>
-            
-            <button
-              onClick={() => window.open(result.url, "_blank", "noopener,noreferrer")}
-              className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-            >
-              <Globe className="w-4 h-4" />
-              공식 사이트
-            </button>
+        
+          {/* HTML 내용을 리액트 컴포넌트로 변환 */}
+        <div className="bg-gray-100 min-h-96 flex flex-col items-center justify-center p-10">
+          <div className="text-center bg-white p-10 rounded-lg shadow-md max-w-2xl">
+            <h1 className="text-3xl font-bold text-blue-600 mb-8">
+              🚀 Elasticsearch 데모 애플리케이션 🚀
+            </h1>
+            <p className="text-gray-700 mb-8 leading-relaxed">
+              Elasticsearch를 활용한 데모 서비스입니다. 아래 링크를 통해 API 문서를 확인하거나 명세 파일을 다운로드, 또는 변환기를 사용하세요.
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <button
+                onClick={() => window.open('http://localhost:8485/swagger-ui.html', '_blank')}
+                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold flex items-center gap-2"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Swagger API 문서 보기
+              </button>
+              
+              <button
+                onClick={() => {
+                  // OpenAPI spec 다운로드 로직
+                  window.open('/v3/api-docs', '_blank');
+                }}
+                className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors font-bold flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                OpenAPI Spec 다운로드 (JSON)
+              </button>
+              
+              <button
+                onClick={() => window.open('http://localhost:8485/openapi-converter.html', '_blank')}
+                className="px-6 py-3 bg-yellow-500 text-gray-900 rounded-lg hover:bg-yellow-600 transition-colors font-bold flex items-center gap-2"
+              >
+                <Zap className="w-4 h-4" />
+                OpenAPI 포맷 변환기
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mt-8">
+              애플리케이션 버전: v1.0.2
+            </p>
           </div>
         </div>
       </div>
-    </div>
+
+
+        </div>
+      </div>
+   
   )
 }
 

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAPI 명세 포맷 변환기</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #007bff; /* Bootstrap primary blue */
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 30px;
+        }
+        h2 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        textarea#jsonInput {
+            width: calc(100% - 22px); /* padding + border */
+            min-height: 200px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #6c757d; /* Bootstrap secondary */
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .file-input-label:hover {
+            background-color: #5a6268;
+        }
+        input[type="file"]#fileInput { /* ID가 fileInput인지 확인! */
+            display: none;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* 버튼 사이 간격 */
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* 화면 작을 때 줄바꿈 */
+        }
+        button, .button-link {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none; /* 링크 스타일 제거 */
+            display: inline-block; /* 링크를 버튼처럼 보이게 */
+        }
+        .btn-fetch { background-color: #17a2b8; } /* Bootstrap info */
+        .btn-fetch:hover { background-color: #117a8b; }
+
+        .btn-convert { background-color: #28a745; } /* Bootstrap success */
+        .btn-convert:hover { background-color: #218838; }
+
+        .btn-download { background-color: #007bff; } /* Bootstrap primary */
+        .btn-download:hover { background-color: #0056b3; }
+
+        .btn-copy { background-color: #ffc107; color: #212529; } /* Bootstrap warning */
+        .btn-copy:hover { background-color: #e0a800; }
+
+        .output-area-wrapper {
+            margin-top: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        pre#outputData {
+            padding: 15px;
+            white-space: pre-wrap; /* 공백 및 줄바꿈 유지 */
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            margin: 0; /* pre 태그 기본 마진 제거 */
+            color: #212529;
+        }
+        iframe#htmlOutputFrame {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+
+        .output-controls {
+            padding: 10px 15px;
+            text-align: right;
+            border-top: 1px solid #ced4da;
+             background-color: #e9ecef;
+             border-bottom-left-radius: 5px;
+             border-bottom-right-radius: 5px;
+        }
+        .status-message {
+            text-align: center;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .status-info { color: #004085; background-color: #cce5ff; border: 1px solid #b8daff; }
+        .status-success { color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb; }
+        .status-error { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; }
+
+        .fetch-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .fetch-group input[type="text"]#apiUrlInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OpenAPI 명세 포맷 변환기</h1>
+
+        <h2>1. OpenAPI JSON 입력</h2>
+        <p>아래 텍스트 영역에 OpenAPI JSON 명세를 붙여넣거나, 파일을 업로드하거나, URL에서 직접 가져오세요.
+           <br><small>(예: 현재 실행 중인 Spring Boot 앱의 경우 <code>/v3/api-docs</code> 또는 전체 URL)</small>
+        </p>
+
+        <div class="fetch-group">
+            <input type="text" id="apiUrlInput" placeholder="/v3/api-docs 또는 http://localhost:포트/v3/api-docs">
+            <button id="fetchApiButton" class="btn-fetch">URL에서 가져오기</button>
+        </div>
+
+        <textarea id="jsonInput" placeholder="여기에 OpenAPI JSON 명세를 붙여넣으세요..."></textarea>
+        <div>
+            <label for="fileInput" class="file-input-label">JSON 파일 업로드</label> <!-- 이 input 태그의 ID가 fileInput인지 확인! -->
+            <input type="file" id="fileInput" accept=".json,application/json">
+            <span id="fileNameDisplay" style="font-style: italic; color: #6c757d;">선택된 파일 없음</span>
+        </div>
+
+
+        <h2>2. 변환할 포맷 선택</h2>
+        <div class="button-group">
+            <button id="convertToCsvButton" class="btn-convert">CSV로 변환</button>
+            <button id="convertToMarkdownButton" class="btn-convert">Markdown으로 변환</button>
+            <button id="convertToHtmlButton" class="btn-convert">간단 HTML로 변환</button>
+        </div>
+
+        <div id="outputContainer" style="display:none;">
+            <h2>3. 변환 결과</h2>
+            <div class="output-area-wrapper">
+                 <pre id="outputData" class="output-area-content" style="display:none;"></pre>
+                 <iframe id="htmlOutputFrame" class="output-area-content" style="display:none;"></iframe>
+            </div>
+            <div class="output-controls">
+                <button id="copyOutputButton" class="btn-copy">클립보드에 복사</button>
+                <a id="downloadOutputLink" class="button-link btn-download" href="#" download="converted-output.txt">결과 다운로드</a>
+            </div>
+        </div>
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+
+<script>
+    // === 유틸리티 함수 정의 (상단으로 이동) ===
+    function updateStatus(message, type = 'info') {
+        const statusMessageEl = document.getElementById('statusMessage'); // 함수 내에서 다시 가져오거나, 전역 변수 사용
+        if (statusMessageEl) {
+            statusMessageEl.textContent = message;
+            statusMessageEl.className = `status-message status-${type}`;
+        } else {
+            console.warn("Status message element not found!");
+        }
+    }
+
+    // === DOM 요소 가져오기 (함수 정의 이후 또는 DOMContentLoaded 내부) ===
+    // DOMContentLoaded 이벤트를 사용하여 HTML 파싱이 완료된 후 스크립트 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded and parsed");
+
+        const jsonInputEl = document.getElementById('jsonInput');
+        const fileInputEl = document.getElementById('fileInput'); // ID 재확인!
+        const fileNameDisplayEl = document.getElementById('fileNameDisplay');
+        const apiUrlInputEl = document.getElementById('apiUrlInput');
+        const fetchApiButtonEl = document.getElementById('fetchApiButton');
+
+        const convertToCsvButtonEl = document.getElementById('convertToCsvButton');
+        const convertToMarkdownButtonEl = document.getElementById('convertToMarkdownButton');
+        const convertToHtmlButtonEl = document.getElementById('convertToHtmlButton');
+
+        const outputContainerEl = document.getElementById('outputContainer');
+        const outputDataEl = document.getElementById('outputData');
+        const htmlOutputFrameEl = document.getElementById('htmlOutputFrame');
+        const copyOutputButtonEl = document.getElementById('copyOutputButton');
+        const downloadOutputLinkEl = document.getElementById('downloadOutputLink');
+        // statusMessageEl은 updateStatus 함수 내부에서 이미 처리하고 있으므로 여기서는 생략 가능
+
+        // 백엔드 API 기본 URL
+        const backendApiBaseUrl = '/api/convert'; // Spring Boot static에서 제공 시 상대 경로
+
+        let currentOutputMimeType = 'text/plain';
+        let currentOutputFilename = 'converted-output.txt';
+
+        function checkElementsAndAddListeners() {
+            console.log("Checking elements for event listeners...");
+            if (!jsonInputEl || !fileInputEl || !fileNameDisplayEl || !apiUrlInputEl || !fetchApiButtonEl ||
+                !convertToCsvButtonEl || !convertToMarkdownButtonEl || !convertToHtmlButtonEl ||
+                !outputContainerEl || !outputDataEl || !htmlOutputFrameEl || !copyOutputButtonEl || !downloadOutputLinkEl) {
+                console.error("하나 이상의 필수 HTML 요소를 찾을 수 없습니다! HTML ID를 다시 확인하세요.");
+                updateStatus("페이지 초기화 오류가 발생했습니다. 개발자 콘솔을 확인해주세요.", "error");
+                return false;
+            }
+            console.log("All essential elements found.");
+
+            // 파일 업로드 처리
+            fileInputEl.addEventListener('change', function(event) {
+                console.log("File input changed");
+                const file = event.target.files[0];
+                if (file) {
+                    fileNameDisplayEl.textContent = `선택된 파일: ${file.name}`;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const parsedJson = JSON.parse(e.target.result);
+                            jsonInputEl.value = JSON.stringify(parsedJson, null, 2);
+                            updateStatus('JSON 파일이 성공적으로 로드되었습니다.', 'success');
+                        } catch (err) {
+                            jsonInputEl.value = e.target.result;
+                            updateStatus(`JSON 파싱 오류: ${err.message}. 원본 텍스트를 확인하세요.`, 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                } else {
+                    fileNameDisplayEl.textContent = '선택된 파일 없음';
+                }
+            });
+
+            // URL에서 API 명세 가져오기
+            fetchApiButtonEl.addEventListener('click', async () => {
+                console.log("Fetch API button clicked");
+                let url = apiUrlInputEl.value.trim();
+                if (!url) {
+                    updateStatus('API 명세 URL을 입력해주세요.', 'error');
+                    return;
+                }
+                if (url.startsWith('/') && !url.startsWith('//')) {
+                    url = window.location.origin + url; // 상대 경로를 절대 경로로 만듦 (만약 /v3/api-docs 만 입력했다면)
+                }
+
+                updateStatus('API 명세를 가져오는 중...', 'info');
+                try {
+                    console.log(`Fetching from URL: ${url}`);
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP 오류! 상태: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+                    jsonInputEl.value = JSON.stringify(data, null, 2);
+                    updateStatus('API 명세를 성공적으로 가져왔습니다.', 'success');
+                } catch (error) {
+                    updateStatus(`API 명세 가져오기 실패: ${error.message}`, 'error');
+                    console.error('Fetch API error:', error);
+                }
+            });
+
+            // 변환 버튼 이벤트 리스너
+            convertToCsvButtonEl.addEventListener('click', () => {
+                console.log("Convert to CSV button clicked");
+                convertAndDisplay('csv', 'text/csv;charset=UTF-8', 'openapi_spec.csv');
+            });
+            convertToMarkdownButtonEl.addEventListener('click', () => {
+                console.log("Convert to Markdown button clicked");
+                convertAndDisplay('markdown', 'text/markdown;charset=UTF-8', 'openapi_spec.md');
+            });
+            convertToHtmlButtonEl.addEventListener('click', () => {
+                console.log("Convert to HTML button clicked");
+                convertAndDisplay('html', 'text/html;charset=UTF-8', 'openapi_spec.html');
+            });
+
+            // 클립보드 복사
+            copyOutputButtonEl.addEventListener('click', () => {
+                console.log("Copy to clipboard button clicked");
+                if (htmlOutputFrameEl.style.display === 'block') {
+                    updateStatus('HTML 결과는 직접 복사할 수 없습니다. 다운로드를 이용해주세요.', 'info');
+                    return;
+                }
+                if (!outputDataEl.textContent) {
+                    updateStatus('복사할 내용이 없습니다.', 'info');
+                    return;
+                }
+                navigator.clipboard.writeText(outputDataEl.textContent)
+                    .then(() => {
+                        updateStatus('클립보드에 복사되었습니다!', 'success');
+                    })
+                    .catch(err => {
+                        updateStatus(`복사 실패: ${err.message}`, 'error');
+                        console.error('Clipboard copy error:', err);
+                    });
+            });
+            return true;
+        } // checkElementsAndAddListeners 끝
+
+        async function convertAndDisplay(format, mimeType, filename) {
+            // ... (이 함수 내용은 이전과 거의 동일하게 유지)
+            console.log(`Attempting to convert to: ${format}`);
+            const jsonData = jsonInputEl.value;
+            if (!jsonData.trim()) {
+                updateStatus('먼저 OpenAPI JSON 명세를 입력하거나 가져오세요.', 'error');
+                return;
+            }
+
+            let parsedJsonData;
+            try {
+                parsedJsonData = JSON.parse(jsonData);
+            } catch (e) {
+                updateStatus(`입력된 JSON이 유효하지 않습니다: ${e.message}`, 'error');
+                return;
+            }
+
+            updateStatus(`${format.toUpperCase()}으로 변환 중...`, 'info');
+            outputContainerEl.style.display = 'none';
+            outputDataEl.style.display = 'none';
+            htmlOutputFrameEl.style.display = 'none';
+
+            const requestUrl = `${backendApiBaseUrl}/${format}`;
+            console.log(`Sending request to backend: POST ${requestUrl}`);
+
+            try {
+                const response = await fetch(requestUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(parsedJsonData)
+                });
+
+                console.log(`Backend response status: ${response.status}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`Backend error response: ${errorText}`);
+                    throw new Error(`변환 실패 (HTTP ${response.status}): ${errorText || response.statusText}`);
+                }
+
+                const resultText = await response.text();
+                // console.log(`Conversion result (first 100 chars): ${resultText.substring(0,100)}`);
+
+                if (format === 'html') {
+                    htmlOutputFrameEl.srcdoc = resultText;
+                    htmlOutputFrameEl.style.display = 'block';
+                    outputDataEl.style.display = 'none';
+                    copyOutputButtonEl.disabled = true;
+                } else {
+                    outputDataEl.textContent = resultText;
+                    outputDataEl.style.display = 'block';
+                    htmlOutputFrameEl.style.display = 'none';
+                    copyOutputButtonEl.disabled = false;
+                }
+
+                outputContainerEl.style.display = 'block';
+                updateStatus(`${format.toUpperCase()} 변환 완료!`, 'success');
+
+                currentOutputMimeType = mimeType;
+                currentOutputFilename = filename;
+                downloadOutputLinkEl.download = filename;
+                downloadOutputLinkEl.href = `data:${mimeType},${encodeURIComponent(resultText)}`;
+
+            } catch (error) {
+                updateStatus(`오류 발생: ${error.message}`, 'error');
+                console.error('Conversion error:', error);
+            }
+        } // convertAndDisplay 끝
+
+        // 페이지 로드 완료 후 요소 확인 및 이벤트 리스너 등록 시작
+        if (!checkElementsAndAddListeners()) {
+            // checkElementsAndAddListeners 내부에서 이미 alert이나 console.error를 호출했을 수 있음
+            console.error("초기화 중 일부 HTML 요소를 찾지 못해 이벤트 리스너를 등록하지 못했습니다.");
+        } else {
+            console.log("All event listeners registered successfully.");
+        }
+    }); // DOMContentLoaded 끝
+</script>
+</body>
+</html>
