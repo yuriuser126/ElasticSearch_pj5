@@ -85,11 +85,11 @@ public class RedditService {
     public Map<String, Object> fetchHotPosts(String subreddit, int limit) {
     	// 토큰 발급받기
         String token = getAccessToken();
-        // 핫 게시글 가져올 URL (limit: 몇 개까지)
-        String url = "https://oauth.reddit.com/r/" + subreddit + "/hot?limit=" + limit;
+        //게시글 가져올 URL (limit: 몇 개까지)
+        String url = "https://www.reddit.com/r/" + subreddit + "/hot.json?limit=" + limit;
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token); // 토큰 포함
+//        headers.set("Authorization", "Bearer " + token); // 토큰 포함
         headers.set("User-Agent", userAgent); // Reddit 필수 헤더
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
