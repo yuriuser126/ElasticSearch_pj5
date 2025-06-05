@@ -6,6 +6,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -30,6 +31,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+
     	System.out.println("✅ SecurityConfig 적용됨 - Swagger 및 static HTML 경로 허용 시도");
     	 http
     	 .cors(Customizer.withDefaults())
@@ -42,8 +44,8 @@ public class SecurityConfig {
 //            		 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
             	     "/es/**","/hackernews/**","/api/stackoverflow/**","/questions",
             	     "/api/convert/**",
-                     "/test" // 이 경로는 MainController를 통해 index.html을 반환
-            	     ).permitAll()  // 인증 없이 허용
+                     "/test", "/reddit/**").permitAll() // 이 경로는 MainController를 통해 index.html을 반환
+            	       // 인증 없이 허용
              .anyRequest().authenticated() // 그 외는 인증 필요
          )
          .httpBasic(Customizer.withDefaults()); // 기본 인증 방식 (Postman/curl 용)
