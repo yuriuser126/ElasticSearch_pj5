@@ -17,9 +17,9 @@ public class SecurityConfig {
     	 .cors(Customizer.withDefaults())
          .csrf(csrf -> csrf.disable()) // CSRF 비활성화
          .authorizeHttpRequests(auth -> auth
-             .requestMatchers("/api/ping", "/favicon.ico", "/v3/api-docs/**",
-            	        "/swagger-ui/**", "/swagger-ui.html", 
-            	        "/es/**","/hackernews/**","/api/stackoverflow/**","/questions").permitAll()  // 인증 없이 허용
+             .requestMatchers("/api/ping", "/favicon.ico",
+            		 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+            	     "/es/**","/hackernews/**","/api/stackoverflow/**","/questions").permitAll()  // 인증 없이 허용
              .anyRequest().authenticated() // 그 외는 인증 필요
          )
          .httpBasic(Customizer.withDefaults()); // 기본 인증 방식 (Postman/curl 용)
