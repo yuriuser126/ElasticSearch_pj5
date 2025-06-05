@@ -1,4 +1,4 @@
-package com.example.demo.Reddit.DTO;
+package com.boot.Reddit.DTO;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

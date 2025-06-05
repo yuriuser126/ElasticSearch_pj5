@@ -1,7 +1,8 @@
-package com.example.demo.Reddit.Repository;
+package com.boot.Reddit.Repository;
 
-import com.example.demo.Reddit.DTO.RedditItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import com.boot.Reddit.DTO.RedditItem;
 
 /**
  * RedditItem 객체를 MongoDB에 저장하거나 불러오기 위한 인터페이스

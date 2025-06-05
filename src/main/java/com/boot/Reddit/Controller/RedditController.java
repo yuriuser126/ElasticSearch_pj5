@@ -1,7 +1,8 @@
-package com.example.demo.Reddit.Controller;
+package com.boot.Reddit.Controller;
 
-import com.example.demo.Reddit.DTO.RedditItem;
-import com.example.demo.Reddit.Service.RedditService;
+import com.boot.Reddit.DTO.RedditItem;
+import com.boot.Reddit.Service.RedditService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,4 +1,4 @@
-package com.example.demo.Reddit.Service;
+package com.boot.Reddit.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -17,8 +17,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.demo.Reddit.DTO.RedditItem;
-import com.example.demo.Reddit.Repository.RedditRepository;
+import com.boot.Reddit.DTO.RedditItem;
+import com.boot.Reddit.Repository.RedditRepository;
 
 @Service
 public class RedditService {

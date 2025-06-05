@@ -5,10 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-<<<<<<< HEAD
-=======
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
->>>>>>> b12a7da398c62077fabda95522c2895a001acddf
+
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -32,18 +30,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-<<<<<<< HEAD
-    	System.out.println("✅ SecurityConfig 적용됨");
-    	http
-        
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/reddit/**").permitAll() // api/ping 인증 없이 허용
-                .anyRequest().authenticated() // 나머지 요청은 인증 필요
-            )
-            .httpBasic(Customizer.withDefaults()); // 기본 인증 방식 활성화
-=======
->>>>>>> b12a7da398c62077fabda95522c2895a001acddf
+
 
     	System.out.println("✅ SecurityConfig 적용됨 - Swagger 및 static HTML 경로 허용 시도");
     	 http
@@ -57,7 +44,7 @@ public class SecurityConfig {
 //            		 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
             	     "/es/**","/hackernews/**","/api/stackoverflow/**","/questions",
             	     "/api/convert/**",
-                     "/test" // 이 경로는 MainController를 통해 index.html을 반환
+                     "/test", "/reddit/**" // 이 경로는 MainController를 통해 index.html을 반환
             	     ).permitAll()  // 인증 없이 허용
              .anyRequest().authenticated() // 그 외는 인증 필요
          )

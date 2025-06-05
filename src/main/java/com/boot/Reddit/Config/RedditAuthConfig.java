@@ -1,4 +1,4 @@
-package com.example.demo.Reddit.Config;
+package com.boot.Reddit.Config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
