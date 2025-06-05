@@ -1,8 +1,4 @@
 <<<<<<< HEAD
-# 🚧 작업 브랜치: feature/yuriuser-elastic
-
-=======
-<<<<<<< HEAD
 # 📢 개발팀 공지사항 & 주의사항 (develop 브랜치 기준)
 
 ## 1. 브랜치 구조 안내
@@ -31,7 +27,6 @@
 =======
 # 🚧 작업 브랜치: feature/tjrdl-elastic
 
->>>>>>> d0d9f12dc98b2ec1d7abc0177d41a5d3905c2dde
 ## 📌 작업 목적
 - 간략하게 작업 목표 : ElasticSearch 구성
 
@@ -42,24 +37,14 @@
 - 작업 진행 중에는 주기적으로 `develop` 최신 상태를 pull 하여 충돌을 최소화하세요.
 
 ## ✅ 진행 상황 체크리스트
-<<<<<<< HEAD
-- [ ] Test it in sts
-- [ ] reddit Elasticsearch 적용 테스트 진행
-=======
 - [ ] Test it in IntelliJ
 - [ ] 구글 트렌드 데이터 Elasticsearch 적용 테스트 진행
->>>>>>> d0d9f12dc98b2ec1d7abc0177d41a5d3905c2dde
 - [ ] 추가기능 있으시면 논의후 추가합시다.
 
 ## 🔄 PR 메시지 
 - 일단 논의먼저 합시다.!
 
-<<<<<<< HEAD
-
-## Sourcetree에서 팀원 브랜치 가져오기
-=======
 - ## Sourcetree에서 팀원 브랜치 가져오기
->>>>>>> d0d9f12dc98b2ec1d7abc0177d41a5d3905c2dde
 
 1. Sourcetree를 실행하고 저장소를 연다.
 2. 상단 메뉴에서 **Fetch** 버튼을 클릭한다. 🔃  
@@ -70,8 +55,5 @@
 5. 로컬 브랜치에서 작업을 진행한다.
 
 > ⚠️ 팀원이 작업한 브랜치를 원격에 **push**하지 않았다면 목록에 나타나지 않습니다.
-<<<<<<< HEAD
-=======
 
 >>>>>>> eda567f83f5d3ae5707cc75a96f81ea8bf4a5e7f
->>>>>>> d0d9f12dc98b2ec1d7abc0177d41a5d3905c2dde
