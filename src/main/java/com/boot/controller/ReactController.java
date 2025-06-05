@@ -11,4 +11,9 @@ public class ReactController {
     public String ping() {
         return "pong";
     }
+    
+    @GetMapping("/secure")
+    public String secure() {
+        return "인증된 사용자만 접근 가능";
+    }
 }

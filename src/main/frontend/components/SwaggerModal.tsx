@@ -11,6 +11,7 @@ interface SwaggerModalProps {
   onClose: () => void
 }
 
+
 const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) => {
   // 상태: API 메서드 리스트
   const [apiMethods, setApiMethods] = useState<any[]>([])
@@ -32,6 +33,8 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
     try {
       // swaggerUrl로부터 JSON 데이터 fetch
       const res = await fetch(result.swaggerUrl)
+      result.swaggerUrl = "http://localhost:8485/v3/api-docs"
+      // result.swaggerUrl = "http://13.209.74.214:8080/v3/api-docs"
 
       // HTTP 응답 상태가 OK가 아니면 에러 발생시키기
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
