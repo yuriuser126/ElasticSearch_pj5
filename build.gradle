@@ -51,6 +51,9 @@ dependencies {
 
 }
 
+springBoot {
+    mainClass = 'com.boot.BootElasticSearchpj5Application'
+}
 tasks.named('test') {
 	useJUnitPlatform()
 }
