@@ -34,8 +34,8 @@ const SwaggerModal: React.FC<SwaggerModalProps> = ({ result, isOpen, onClose }) 
     try {
       // swaggerUrl로부터 JSON 데이터 fetch
       const res = await fetch(result.swaggerUrl)
-      result.swaggerUrl = "http://localhost:8485/v3/api-docs"
-      // result.swaggerUrl = "http://13.209.74.214:8080/v3/api-docs"
+      // result.swaggerUrl = "http://localhost:8485/v3/api-docs"
+      result.swaggerUrl = "http://54.180.149.251:8485/v3/api-docs"
 
       // HTTP 응답 상태가 OK가 아니면 에러 발생시키기
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
@@ -278,7 +278,8 @@ fetch('${result.apiEndpoint}/api/v1/data', {
 
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               <button
-                onClick={() => window.open('http://localhost:8485/swagger-ui.html', '_blank')}
+                // onClick={() => window.open('http://localhost:8485/swagger-ui.html', '_blank')}
+                onClick={() => window.open('http://54.180.149.251/swagger-ui.html', '_blank')}
                 className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold flex items-center gap-2"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -297,7 +298,8 @@ fetch('${result.apiEndpoint}/api/v1/data', {
               </button>
               
               <button
-                onClick={() => window.open('http://localhost:8485/openapi-converter.html', '_blank')}
+                // onClick={() => window.open('http://localhost:8485/openapi-converter.html', '_blank')}
+                onClick={() => window.open('http://54.180.149.251/openapi-converter.html', '_blank')}
                 className="px-6 py-3 bg-yellow-500 text-gray-900 rounded-lg hover:bg-yellow-600 transition-colors font-bold flex items-center gap-2"
               >
                 <Zap className="w-4 h-4" />
