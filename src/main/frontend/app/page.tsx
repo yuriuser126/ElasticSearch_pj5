@@ -10,6 +10,9 @@ import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
+import Link from "next/link";
+import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
+import { useRouter } from 'next/navigation';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -23,10 +26,26 @@ async function pingServer() {
   }
 }
 
+
 const HomePage: React.FC = () => {
   const { results, loading, error, query, totalResults, searchTime, search } = useSearch()
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showSwaggerModal, setShowSwaggerModal] = useState(false)
+
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+  const logoutUser = useAuthStore((state) => state.logoutUser);
+  const router = useRouter();
+  const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
+
+
+  React.useEffect(() => {
+    checkAuthStatus(); // 앱이 마운트될 때 로그인 상태 확인
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push('/user/login');
+  };
 
   const handleSwaggerClick = (result: SearchResult) => {
     setSelectedResult(result)
@@ -36,9 +55,23 @@ const HomePage: React.FC = () => {
   const popularKeywords = ["교통", "날씨", "인구", "관광", "공공데이터", "API"]
 
   const [currentView, setCurrentView] = useState<"default" | "history">("default")
-  
 
+  const Header = () => {
+    // 훅과 변수 선언은 return문 바깥에 위치
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+    const loading = useAuthStore((state) => state.loading);
+    const logoutUser = useAuthStore((state) => state.logoutUser);
+    const router = useRouter();
+
+    const [searchValue, setSearchValue] = useState("");
+
+    const handleLogout = async () => {
+      await logoutUser();
+      router.push('/user/login');
+    };
+  }
   return (
+
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-100">
@@ -54,6 +87,18 @@ const HomePage: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-4 text-sm text-gray-600">
+              {isLoggedIn ? (
+                  <button
+                      onClick={handleLogout}
+                      className="text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer p-0"
+                  >
+                    로그아웃
+                  </button>
+              ) : (
+                  <Link href="/user/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    로그인
+                  </Link>
+              )}
               <div className="flex items-center gap-1">
                 <SearchIcon className="w-4 h-4" />
                 <span>검색</span>
