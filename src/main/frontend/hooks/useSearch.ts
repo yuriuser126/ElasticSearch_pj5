@@ -13,7 +13,7 @@ export const useSearch = () => {
   const [totalResults, setTotalResults] = useState(0)
   const [searchTime, setSearchTime] = useState(0)
   const [knowledgePanel, setKnowledgePanel] = useState<any>(null)
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8485"
 
 
 

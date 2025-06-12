@@ -2,7 +2,10 @@ package com.boot.Elastic;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Slf4j
 @RestController
 @RequestMapping("/es")
 @Tag(name = "Elasticsearch API", description = "Elasticsearch와 연동된 CRUD 및 검색 기능 제공")
@@ -41,6 +45,9 @@ public class ElasticController {
 
     @Autowired
     private ElasticConfig elasticConfig;
+
+    @Autowired
+    private ElasticService elasticService;
 
 
     @Operation(summary = "문서 추가", description = "my_index 인덱스에 새 문서를 추가합니다.")
@@ -74,19 +81,40 @@ public class ElasticController {
     
     @Operation(summary = "모든 질문 조회 또는 검색", description = "query 파라미터가 있으면 검색, 없으면 전체 조회합니다.")
     @GetMapping("/questions")
-    public Object getOrSearchQuestions(@RequestParam(name = "query", required = false) String query) throws IOException {
+    public Object getOrSearchQuestions(@RequestParam(name = "query", required = false) String query) throws Exception {
         ElasticsearchClient client = elasticConfig.getClient();
+
+        String searchQuery;
+        if (query != null && !query.isEmpty()) {
+            // 서비스 단에서 번역 수행
+            searchQuery = elasticService.translate(query);
+
+            log.info("번역된 쿼리: {}", searchQuery);
+        } else {
+            searchQuery = query;
+        }
+
 
         SearchRequest request = SearchRequest.of(s -> s
             .index("mydb.*")  // 정확한 인덱스로 고정하는 것이 더 안전
-            .size(1000)
+            .size(20)
             .query(q -> {
-                if (query == null || query.isEmpty()) {
+                if (searchQuery == null || searchQuery.isEmpty()) {
+                    log.info("elastic controller : "+searchQuery);
                     return q.matchAll(m -> m);
                 } else {
-                    return q.match(m -> m
-                        .field("title")
-                        .query(query)
+                    log.info("elastic controller2 : "+searchQuery);
+                    return q.bool(b -> b
+                            .should(m -> m.multiMatch(mm -> mm
+                                    .fields("title^5", "body^2", "tags")
+                                    .query(searchQuery)
+                                    .type(TextQueryType.BestFields)
+                                    .fuzziness("AUTO")
+                                    .operator(Operator.Or)
+                                    .minimumShouldMatch("70%")
+
+                            ))
+
                     );
                 }
             })
