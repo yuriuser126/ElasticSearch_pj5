@@ -13,6 +13,8 @@ import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
 import { useRouter, usePathname } from 'next/navigation'; 
 import Link from 'next/link';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 
 
@@ -56,58 +58,8 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            {/* 로고 영역 */}
-              <Link href="/" className="flex items-center gap-3 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-600 rounded-lg">
-                    <Database className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                    <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-                  </div>
-                </div>
-               </Link>
-              {/* 버튼 그룹 */}
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-               <Button
-                  variant={pathname === '/' ? 'default' : 'ghost'}
-                  onClick={() => router.push('/')}
-                  className="flex items-center gap-1"
-                >
-                  <SearchIcon className="w-4 h-4" />
-                  검색
-                </Button>
-
-              <Button
-                variant="ghost"
-                className="flex items-center gap-1"
-                onClick={() => {
-                  /* 예: API 문서로 이동하거나 모달 띄움 */
-                }}
-              >
-                <Code className="w-4 h-4" />
-                API 문서
-              </Button>
-
-              <Button
-                variant={pathname === '/history' ? 'default' : 'ghost'}
-                onClick={() => router.push('/history')}
-                className="flex items-center gap-1"
-              >
-                <History className="w-4 h-4" />
-                수집 이력
-              </Button>
-                  
-              
-            </div>
-          </div>
-        </div>
-      </header>
+     
+      <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!query && <PingTest />}
@@ -166,12 +118,6 @@ const HomePage: React.FC = () => {
                 </div>
               )}
             </div>
-         
-
-
-
-       
-      
 
             {/* 로딩 표시 */}
             {loading && (
@@ -203,11 +149,12 @@ const HomePage: React.FC = () => {
             {/* 검색 결과 목록 */}
             {!loading && !error && results.length > 0 && (
               <div className="space-y-6">
-                {results.map((result) => (
-                <SearchResultCard
-                    key={`${result.source ?? 'unknown'}-${result.id ?? result.url ?? result.link ?? Math.random()}`}
+                {results.map((result, index) => (
+                  <SearchResultCard
+                    key={`${result.source ?? 'unknown'}-${result.id ?? index}`}
                     result={result}
-                    onSwaggerClick={handleSwaggerClick}                  />
+                    onSwaggerClick={handleSwaggerClick}
+                  />
                 ))}
               </div>
             )}
@@ -274,14 +221,7 @@ const HomePage: React.FC = () => {
       {/* Swagger 모달 */}
       <SwaggerModal result={selectedResult} isOpen={showSwaggerModal} onClose={() => setShowSwaggerModal(false)} />
 
-      {/* 푸터 */}
-      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>© 2024 OpenData API Search. 기술 키워드 기반 오픈 데이터 검색 플랫폼</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

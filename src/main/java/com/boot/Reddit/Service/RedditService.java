@@ -1,5 +1,7 @@
 package com.boot.Reddit.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,11 +19,15 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.boot.Elastic.ElasticService;
 import com.boot.Reddit.DTO.RedditItem;
 import com.boot.Reddit.Repository.RedditRepository;
 
 @Service
 public class RedditService {
+	
+	 @Autowired
+    private ElasticService elasticService;
 
 	// 설정파일(application.properties)에서 Reddit API 인증정보 읽어옴
     @Value("${reddit.client.id}")
@@ -138,5 +144,40 @@ public class RedditService {
     // 4. DB에 저장된 전체 RedditItem 조회 메서드
     public List<RedditItem> getAllItems() {
         return redditRepository.findAll();
+    }
+    
+    
+    public void saveTenHotPostToElastic(String subreddit) throws IOException {
+        Map<String, Object> response = fetchHotPosts(subreddit, 10);
+        if (response == null) return;
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
+        if (children == null || children.isEmpty()) return;
+        
+     // 1. RedditItem 객체들을 담을 리스트 생성
+        List<RedditItem> items = new ArrayList<>();
+
+        // 2. children 리스트 전체를 반복하면서 RedditItem 객체 생성 및 리스트에 추가
+        for (Map<String, Object> child : children) {
+            Map<String, Object> postData = (Map<String, Object>) child.get("data");
+            RedditItem item = new RedditItem();
+            item.setId((String) postData.get("id"));
+            item.setTitle((String) postData.get("title"));
+            item.setSubreddit(subreddit);
+            item.setUrl((String) postData.get("url"));
+            Object scoreObj = postData.get("score");
+            if (scoreObj instanceof Number) {
+                item.setScore(((Number) scoreObj).intValue());
+            }
+            items.add(item);
+        }
+
+        // 3. 10개를 저장하는 메서드 호출 (파라미터가 리스트여야 함)
+        try {
+            elasticService.saveTenRedditItem(items);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

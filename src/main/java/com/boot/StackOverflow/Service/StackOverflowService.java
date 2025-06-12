@@ -2,6 +2,7 @@ package com.boot.StackOverflow.Service;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -73,29 +74,34 @@ public class StackOverflowService {
         }
     }
     
-//    Elastic search 저장용
-    public void saveOneQuestionToElastic() {
+    //    Elastic search 저장용
+    //최신 인기 질문 10개를 가져오는 요청
+    public void saveTenQuestionToElastic() {
         Map<String, Object> result = restTemplate.getForObject(
-                "https://api.stackexchange.com/2.3/questions?order=desc&sort=activity&site=stackoverflow&pagesize=1&key=" + apiKey + "&filter=withbody",
+                "https://api.stackexchange.com/2.3/questions?order=desc&sort=activity&site=stackoverflow&pagesize=10&key=" + apiKey + "&filter=withbody",
                 Map.class);
 
         List<Map<String, Object>> items = (List<Map<String, Object>>) result.get("items");
 
         if (items != null && !items.isEmpty()) {
-            Map<String, Object> item = items.get(0);
-            StackOverflowQuestion q = new StackOverflowQuestion();
-            q.setQuestion_id(((Number) item.get("question_id")).intValue());
-            q.setTitle((String) item.get("title"));
-            q.setBody((String) item.get("body"));
-            q.setTags((List<String>) item.get("tags"));
-            q.setLink((String) item.get("link"));
-            q.setScore(item.get("score") != null ? ((Number) item.get("score")).intValue() : null);
-            q.setAnswer_count(item.get("answer_count") != null ? ((Number) item.get("answer_count")).intValue() : null);
-            q.setView_count(item.get("view_count") != null ? ((Number) item.get("view_count")).intValue() : null);
-            q.setSource("StackOverflow");
+        	List<StackOverflowQuestion> questions = new ArrayList<>();  // 리스트 선언
+        	for (Map<String, Object> item : items) {
+                StackOverflowQuestion q = new StackOverflowQuestion();
+                q.setQuestion_id(((Number) item.get("question_id")).intValue());
+                q.setTitle((String) item.get("title"));
+                q.setBody((String) item.get("body"));
+                q.setTags((List<String>) item.get("tags"));
+                q.setLink((String) item.get("link"));
+                q.setScore(item.get("score") != null ? ((Number) item.get("score")).intValue() : null);
+                q.setAnswer_count(item.get("answer_count") != null ? ((Number) item.get("answer_count")).intValue() : null);
+                q.setView_count(item.get("view_count") != null ? ((Number) item.get("view_count")).intValue() : null);
+                q.setSource("StackOverflow");
+                questions.add(q);  // 리스트에 추가
 
-            try {
-                elasticService.saveOne(q);
+            }
+        	
+        	try {
+            	elasticService.saveTen(questions);  // 리스트 한번에 저장
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -6,7 +6,9 @@ import com.boot.HackerNews.Repository.HackerNewsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.boot.Elastic.ElasticService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,10 @@ public class HackerNewsService {
 
     @Autowired
     private HackerNewsRepository hackerNewsRepository;
+    
+    // Elasticsearch 저장용 서비스 주입
+    @Autowired
+    private ElasticService elasticService;
 
     public List<HackerNewsItem> getTopStories(int count) {
         // 1. 인기글 ID 목록 조회
@@ -36,5 +42,19 @@ public class HackerNewsService {
     public void saveTopStoriesToMongo(int count) {
         List<HackerNewsItem> topStories = getTopStories(count);
         hackerNewsRepository.saveAll(topStories);
+    }
+    
+    
+    /**
+     * [추가] 인기 해커뉴스 글을 가져와서 Elasticsearch에 저장하는 메서드
+     * @param count 저장할 인기 글 개수
+     * @throws IOException Elasticsearch 저장 중 오류 발생 시 예외 throw
+     */
+    public void saveTopStoriesToElastic(int count) throws IOException {
+        List<HackerNewsItem> topStories = getTopStories(count);
+        for (HackerNewsItem item : topStories) {
+            // ElasticService의 saveOneHackerNewsItem 메서드 호출하여 저장
+            elasticService.saveOneHackerNewsItem(item);
+        }
     }
 }

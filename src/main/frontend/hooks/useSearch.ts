@@ -43,16 +43,18 @@ export const useSearch = () => {
       console.log("📦 검색 결과:", response.data);
 
       // ES 응답이 배열인지, 객체 안 배열인지 확인 후 flatten
-const rawResults: any[] = Array.isArray(response.data)
-  ? response.data
-  : response.data.results || [];
+      const rawResults: any[] = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
 
-// question_id를 id로, tags를 keywords로 변환
-const apiResults: SearchResult[] = rawResults.map((r) => ({
-  ...r,
-  id: String(r.question_id),     // question_id → id
-  keywords: r.tags || [],        // tags → keywords
-}));
+        
+      // question_id를 id로 없으면 index사용용, tags를 keywords로 변환
+      const apiResults: SearchResult[] = rawResults.map((r, index) => ({
+        ...r,
+        id: String(r.question_id ?? index),    // question_id → id ,question_id가 없으면 index 사용
+        keywords: r.tags || [],        // tags → keywords
+      }));
+
       const knowledgeData = response.data.knowledgePanel || null
 
       setResults(apiResults)

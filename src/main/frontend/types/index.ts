@@ -66,3 +66,10 @@ export interface HackerNewsItem {
   descendants?: number;
   type?: string;
 }
+
+export interface TrendKeyword {
+  keyword: string
+  count: number
+  trend: "up" | "down" | "stable"
+  percentage: number
+}
