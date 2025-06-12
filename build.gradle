@@ -11,7 +11,7 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17) // JDK 버전 맞게 설정
 		
-	}
+	}																																																																											
 }
 
 configurations {

@@ -58,8 +58,7 @@ public class RedditService {
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         // 클라이언트 자격증명 방식
-        body.add("grant_type", "client_credentials");
-        
+        body.add("grant_type", "client_credentials");  
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
         
@@ -74,8 +73,7 @@ public class RedditService {
 			 System.out.println("❌ Token Error: " + e.getMessage());
 		        e.printStackTrace();
 		        return null;
-		    }
-    	 
+		    }   	 
     }
 
     /**
@@ -86,6 +84,7 @@ public class RedditService {
     	// 토큰 발급받기
         String token = getAccessToken();
         //게시글 가져올 URL (limit: 몇 개까지)
+//        String url = "https://outh.reddit.com/r/" + subreddit + "/hot.json?limit=" + limit;
         String url = "https://www.reddit.com/r/" + subreddit + "/hot.json?limit=" + limit;
 
         HttpHeaders headers = new HttpHeaders();

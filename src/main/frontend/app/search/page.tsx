@@ -11,6 +11,7 @@ import Navigation from "@/components/ui/Navigation"
 import ErrorBoundary from "@/components/ErrorBoundary"
 import { useSearch } from "@/hooks/useSearch"
 import type { SearchResult } from "@/types"
+import type { KnowledgePanelType } from "@/types"
 
 // 코드 스플리팅
 const KnowledgePanel = lazy(() => import("@/components/ui/KnowledgePanel"))
@@ -23,6 +24,8 @@ const SearchPage: React.FC = () => {
   const query = searchParams.get("q") || ""
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showModal, setShowModal] = useState(false)
+  
+
 
   const { results, knowledgePanel, loading, error, filters, totalResults, searchTime, search } = useSearch()
 
@@ -31,6 +34,12 @@ const SearchPage: React.FC = () => {
       search(query)
     }
   }, [query, search])
+
+  useEffect(() => {
+  if (knowledgePanel) {
+    console.log("📌 지식 패널 데이터:", knowledgePanel)
+  }
+}, [knowledgePanel])
 
   const handleSearch = (newQuery: string) => {
     if (newQuery !== query) {
@@ -157,10 +166,11 @@ const SearchPage: React.FC = () => {
               <div className="space-y-6">
                 {/* 지식 패널 */}
                 {knowledgePanel && (
-                  <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
-                    <KnowledgePanel data={knowledgePanel} />
-                  </Suspense>
-                )}
+                <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
+                  <KnowledgePanel data={knowledgePanel} />
+                </Suspense>
+                  )}
+
 
                 {/* 트렌드 사이드바 */}
                 <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>

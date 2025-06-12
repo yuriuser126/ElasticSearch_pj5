@@ -3,6 +3,7 @@
 import type React from "react"
 import { ExternalLink, Download, Star, Calendar, Database, Tag, FileText, Code } from "lucide-react"
 import type { SearchResult } from "@/types"
+import { HackerNewsItem } from "@/types"; // `@/types/index.ts`는 index라 생략 가능
 
 interface SearchResultCardProps {
   result: SearchResult
@@ -19,6 +20,18 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
     e.stopPropagation()
     onSwaggerClick(result)
   }
+
+  // 키워드 배열 준비
+  const keywords = (Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || [])
+  .filter(keyword => typeof keyword === "string" && keyword.trim() !== "");
+
+  // 디버깅용 출력
+  console.log("keywords for tags:", keywords);
+
+    type Props = {
+    result: HackerNewsItem;
+    onSwaggerClick: () => void;
+    };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 p-6">
@@ -50,21 +63,30 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
 
       {/* 키워드 태그 */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {result.keywords.slice(0, 5).map((keyword, index) => (
-          <span
-            key={index}
-            className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full font-medium"
-          >
-            <Tag className="w-3 h-3" />
-            {keyword}
-          </span>
-        ))}
-        {result.keywords.length > 5 && (
+        {(Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || [])
+        
+          .filter(keyword => typeof keyword === "string" && keyword.trim() !== "")  // 빈값 및 undefined 제거
+          .slice(0, 5)
+          .map((keyword, index) => (
+            <span
+              key={`${keyword}-${index}`}   // 키워드는 keyword + index로 고유 키
+              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full font-medium"
+            >
+              <Tag className="w-3 h-3" />
+              {keyword}
+            </span>
+          ))
+        }
+      </div>
+
+
+        {/* 5개 초과 키워드 처리 */}
+        {(Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || []).length > 5 && (
           <span className="px-3 py-1 bg-gray-100 text-gray-500 text-sm rounded-full">
-            +{result.keywords.length - 5}개 더
+            +{(Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || []).length - 5}개 더
           </span>
         )}
-      </div>
+      
 
       {/* API 정보 */}
       {result.apiEndpoint && (
@@ -87,7 +109,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
           <span>{result.license}</span>
           <span className="flex items-center gap-1">
             <Download className="w-3 h-3" />
-            {result.downloadCount.toLocaleString()}회
+            {/* {result.downloadCount.toLocaleString()}회 */}
           </span>
         </div>
 
