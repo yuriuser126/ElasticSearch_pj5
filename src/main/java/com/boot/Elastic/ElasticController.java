@@ -6,6 +6,7 @@ import co.elastic.clients.elasticsearch.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -70,27 +71,42 @@ public class ElasticController {
             return "문서를 찾을 수 없습니다.";
         }
     }
+    
+    @Operation(summary = "모든 질문 조회 또는 검색", description = "query 파라미터가 있으면 검색, 없으면 전체 조회합니다.")
+    @GetMapping("/questions")
+    public Object getOrSearchQuestions(@RequestParam(name = "query", required = false) String query) throws IOException {
+        ElasticsearchClient client = elasticConfig.getClient();
+
+        SearchRequest request = SearchRequest.of(s -> s
+            .index("mydb.*")  // 정확한 인덱스로 고정하는 것이 더 안전
+            .size(1000)
+            .query(q -> {
+                if (query == null || query.isEmpty()) {
+                    return q.matchAll(m -> m);
+                } else {
+                    return q.match(m -> m
+                        .field("title")
+                        .query(query)
+                    );
+                }
+            })
+        );
+
+        SearchResponse<Map> response = client.search(request, Map.class);
+
+        return response.hits().hits().stream()
+            .map(hit -> (Map<String, Object>) hit.source())
+            .collect(Collectors.toList());
+    }
+
 
     
-    @Operation(summary = "모든 질문 조회", description = "mydb.stackoverflowquestions 인덱스에서 전체 질문을 조회합니다.")
-    @GetMapping("/questions")
-    public Object getQuestions() throws IOException {
-        ElasticsearchClient client = elasticConfig.getClient();
-        SearchRequest request = SearchRequest.of(s -> s
-//                .index("mydb.stackoverflowquestions")
-                        .index("mydb.*")
-                        .size(1000)
-//                .size(25)
-                        .query(q -> q.matchAll(m -> m))
-        );
-        SearchResponse<Map> response = client.search(request, Map.class);
-        return response.hits().hits().stream()
-                .map(hit -> (Map<String, Object>) hit.source())
-                .collect(Collectors.toList());
-   
-    	}
+
+
 
 }
+
+
 
 /*
  *     @Operation(summary = "모든 질문 조회", description = "mydb.stackoverflowquestions 인덱스에서 전체 질문을 조회합니다.")

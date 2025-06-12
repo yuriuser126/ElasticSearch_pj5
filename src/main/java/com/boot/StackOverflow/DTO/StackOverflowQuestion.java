@@ -18,4 +18,5 @@ public class StackOverflowQuestion {
     private Integer view_count;
     private Integer answer_count;
     private String link;
+    private String source;
 }
