@@ -1,8 +1,8 @@
 "use client"
 
 import React from "react"
-import { useState } from "react"
-import { Database, SearchIcon, Code, TrendingUp } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Database, SearchIcon, Code, TrendingUp, History } from "lucide-react"
 import SearchBar from "@/components/SearchBar"
 import SearchResultCard from "@/components/SearchResultCard"
 import SwaggerModal from "@/components/SwaggerModal"
@@ -10,15 +10,46 @@ import PingTest from "@/components/PingTest";
 import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
-import { History } from "lucide-react";
-import { useRouter } from 'next/navigation'; // next/router 대신 next/navigation 사용
+import { useRouter } from 'next/navigation';
+import TopKeywordsChart from "@/components/ui/TopKeywordsChart"; // 1. TopKeywordsChart를 import합니다.
 
 const HomePage: React.FC = () => {
   const { results, loading, error, query, totalResults, searchTime, search } = useSearch()
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showSwaggerModal, setShowSwaggerModal] = useState(false)
-  const router = useRouter(); // useRouter 훅 사용
+  const router = useRouter(); 
 
+  // ▼▼▼▼▼ 이 부분이 추가되었습니다 ▼▼▼▼▼
+    // 페이지가 처음 로드될 때 한 번만 실행되는 로직
+	// 상태 변수 생성 false면 신호등 빨간불과 같은 상태입니다 표시를 안 함
+	const [dataReady, setDataReady] = useState(false);
+
+	// 빈 배열 전달해서 백에서 데이터 수집을 요청하는 createRealData 함수 호출 
+	useEffect(() => {
+	    const createRealData = async () => {
+	      console.log("메인 페이지 로드됨. 실제 데이터 생성을 요청합니다...");
+	      try {
+			//백엔드에 데이터 생성 및 저장 API 호출
+	        const response = await fetch('/api/stackoverflow/fetch-real-data', {
+	          method: 'POST',
+	        });
+	        if (response.ok) {
+	          const message = await response.text();
+	          console.log("백엔드 응답:", message);
+			  // api 호출이 성공하면 dataReady 상태를 true로 변경
+			  setDataReady(true);
+	        } else {
+	          console.error("실제 데이터 생성에 실패했습니다.");
+	        }
+	      } catch (error) {
+	        console.error("API 호출 중 오류 발생:", error);
+	      }
+	    };
+
+	    createRealData();
+	  }, []);
+    // ▲▲▲▲▲ 여기까지 추가되었습니다 ▲▲▲▲▲
+  
   const handleSwaggerClick = (result: SearchResult) => {
     setSelectedResult(result)
     setShowSwaggerModal(true)
@@ -26,7 +57,6 @@ const HomePage: React.FC = () => {
 
   const popularKeywords = ["교통", "날씨", "인구", "관광", "공공데이터", "API"]
 
-  // history 페이지로 이동하는 함수
   const goToHistoryPage = () => {
     router.push('/history');
   };
@@ -55,17 +85,14 @@ const HomePage: React.FC = () => {
                 <Code className="w-4 h-4" />
                 <span>API 문서</span>
               </div>
-              
-               
-                <Button
-                    variant="ghost" // 이력 페이지로 이동하는 버튼이므로 항상 ghost 스타일 유지
-                    onClick={goToHistoryPage} // 클릭 시 history 페이지로 이동
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    수집 이력
-                  </Button>
-              
+              <Button
+                  variant="ghost" 
+                  onClick={goToHistoryPage}
+                  className="flex items-center gap-2"
+                >
+                  <History className="h-4 w-4" />
+                  수집 이력
+                </Button>
             </div>
           </div>
         </div>
@@ -86,29 +113,37 @@ const HomePage: React.FC = () => {
 
           <SearchBar onSearch={search} loading={loading} />
 
-          {/* 인기 키워드 */}
+          {/* 인기 키워드 및 Top 10 차트 */}
           {!query && (
             <div className="mt-8">
-              <p className="text-sm text-gray-600 mb-3">인기 검색어:</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {popularKeywords.map((keyword) => (
-                  <button
-                    key={keyword}
-                    onClick={() => search(keyword)}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
-                  >
-                    {keyword}
-                  </button>
-                ))}
+              <div className="mb-12"> {/* 인기 키워드 섹션 */}
+                <p className="text-sm text-gray-600 mb-3">인기 검색어:</p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {popularKeywords.map((keyword) => (
+                    <button
+                      key={keyword}
+                      onClick={() => search(keyword)}
+                      className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                    >
+                      {keyword}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 여기에 Top 10 차트를 추가합니다. */}
+              <div className="max-w-4xl mx-auto">
+                  {/*<TopKeywordsChart />*/}
+				  <TopKeywordsChart dataReady={dataReady} />
               </div>
             </div>
           )}
         </div>
 
-        {/* 검색 결과 */}
+        {/* 검색 결과 (이하 로직은 수정 없음) */}
         {query && (
+          // ... 기존 검색 결과 표시 로직 ...
           <div className="mb-8">
-            {/* 검색 결과 정보 */}
             <div className="flex items-center justify-between mb-6">
               <div className="text-sm text-gray-600">
                 "<span className="font-medium text-gray-900">{query}</span>"에 대한 검색 결과{" "}
@@ -127,7 +162,6 @@ const HomePage: React.FC = () => {
               )}
             </div>
 
-            {/* 로딩 표시 */}
             {loading && (
               <div className="space-y-6">
                 {[...Array(3)].map((_, index) => (
@@ -145,7 +179,6 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
-            {/* 에러 표시 */}
             {error && (
               <div className="text-center py-12">
                 <Database className="w-16 h-16 text-red-300 mx-auto mb-4" />
@@ -154,7 +187,6 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
-            {/* 검색 결과 목록 */}
             {!loading && !error && results.length > 0 && (
               <div className="space-y-6">
                 {results.map((result) => (
@@ -163,7 +195,6 @@ const HomePage: React.FC = () => {
               </div>
             )}
 
-            {/* 검색 결과 없음 */}
             {!loading && !error && results.length === 0 && (
               <div className="text-center py-12">
                 <SearchIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -189,7 +220,7 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* 서비스 소개 (검색 전에만 표시) */}
+        {/* ... (이하 서비스 소개 및 푸터 등 나머지 코드는 동일) ... */}
         {!query && (
           <div className="grid md:grid-cols-3 gap-8 mt-16">
             <div className="text-center">
@@ -221,10 +252,8 @@ const HomePage: React.FC = () => {
         )}
       </main>
 
-      {/* Swagger 모달 */}
       <SwaggerModal result={selectedResult} isOpen={showSwaggerModal} onClose={() => setShowSwaggerModal(false)} />
 
-      {/* 푸터 */}
       <footer className="bg-gray-50 border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-600">

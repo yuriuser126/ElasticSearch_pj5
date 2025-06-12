@@ -88,27 +88,27 @@ public class ElasticController {
     public List<Map<String, Object>> getTopKeywords() throws IOException {
         ElasticsearchClient client = elasticConfig.getClient();
 
+        //Elasticsearch에 보낼 검색 요청 생성
         SearchRequest request = SearchRequest.of(s -> s
-                .index("stackoverflowquestions")
+                .index("mydb.questions")// 조회할 인덱스 입력 properties에 mydb로 되어 있어서 일단 이렇게 작성
                 .size(0)
-                .aggregations("top_tags", a -> a
+                .aggregations("top_tags", a -> a// top_tags라는 이름으로 집계 요청하기
                         .terms(t -> t
                                 .field("tags.keyword")
-                                .size(10)
+                                .size(10)// 상위 10개 결과만 요청
                         )
                 )
         );
 
         SearchResponse<Void> response = client.search(request, Void.class);
 
-        // 집계 결과 파싱 및 반환
+        // elasticsearch에서 받은 결과를 추출
         return response.aggregations()
                 .get("top_tags")
                 .sterms()
                 .buckets()
                 .array()
                 .stream()
-                // 이 부분이 수정되었습니다.
                 .map(bucket -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("key", bucket.key().stringValue());
@@ -117,6 +117,10 @@ public class ElasticController {
                 })
                 .collect(Collectors.toList());
     }
+    
+    /*
+     * 코드는 stackoverflowquestions 인덱스 내 tags 필드를 분석하여, 가장 자주 등장하는 태그(키워드) 10개를 개수와 함께 반환
+     * */
 }
 
 /*

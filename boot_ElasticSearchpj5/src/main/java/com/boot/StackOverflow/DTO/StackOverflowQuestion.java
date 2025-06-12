@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Data
-@Document(collection = "stackoverflowquestions")
+@Document(collection = "questions")
 public class StackOverflowQuestion {
     @Id
     private Integer question_id;
