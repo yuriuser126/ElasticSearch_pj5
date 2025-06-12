@@ -1,22 +1,28 @@
 package com.boot.StackOverflow.Service;
 
 
-import com.boot.StackOverflow.DTO.StackOverflowQuestion;
-import com.boot.StackOverflow.Repository.StackOverflowQuestionRepository;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.boot.Elastic.ElasticService;
+import com.boot.StackOverflow.DTO.StackOverflowQuestion;
+import com.boot.StackOverflow.Repository.StackOverflowQuestionRepository;
 
 
 @Service
 public class StackOverflowService {
     @Value("${stackoverflow.apiKey}")
     private String apiKey;
+    
+    @Autowired
+    private ElasticService elasticService;
 
     @Autowired
     private StackOverflowQuestionRepository repository;
@@ -64,6 +70,35 @@ public class StackOverflowService {
 
                 repository.saveAll(questions);
 
+        }
+    }
+    
+//    Elastic search 저장용
+    public void saveOneQuestionToElastic() {
+        Map<String, Object> result = restTemplate.getForObject(
+                "https://api.stackexchange.com/2.3/questions?order=desc&sort=activity&site=stackoverflow&pagesize=1&key=" + apiKey + "&filter=withbody",
+                Map.class);
+
+        List<Map<String, Object>> items = (List<Map<String, Object>>) result.get("items");
+
+        if (items != null && !items.isEmpty()) {
+            Map<String, Object> item = items.get(0);
+            StackOverflowQuestion q = new StackOverflowQuestion();
+            q.setQuestion_id(((Number) item.get("question_id")).intValue());
+            q.setTitle((String) item.get("title"));
+            q.setBody((String) item.get("body"));
+            q.setTags((List<String>) item.get("tags"));
+            q.setLink((String) item.get("link"));
+            q.setScore(item.get("score") != null ? ((Number) item.get("score")).intValue() : null);
+            q.setAnswer_count(item.get("answer_count") != null ? ((Number) item.get("answer_count")).intValue() : null);
+            q.setView_count(item.get("view_count") != null ? ((Number) item.get("view_count")).intValue() : null);
+            q.setSource("StackOverflow");
+
+            try {
+                elasticService.saveOne(q);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

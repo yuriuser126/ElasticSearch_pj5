@@ -6,13 +6,19 @@ import { Database, SearchIcon, Code, TrendingUp } from "lucide-react"
 import SearchBar from "@/components/SearchBar"
 import SearchResultCard from "@/components/SearchResultCard"
 import SwaggerModal from "@/components/SwaggerModal"
+import PingTest from "@/components/PingTest";
 import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
-import Link from "next/link";
 import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
+
+
+
+
+
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,8 +32,8 @@ async function pingServer() {
   }
 }
 
-
 const HomePage: React.FC = () => {
+  const pathname = usePathname();
   const { results, loading, error, query, totalResults, searchTime, search } = useSearch()
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showSwaggerModal, setShowSwaggerModal] = useState(false)
@@ -52,24 +58,12 @@ const HomePage: React.FC = () => {
     setShowSwaggerModal(true)
   }
 
-  const popularKeywords = ["교통", "날씨", "인구", "관광", "공공데이터", "API"]
+  const popularKeywords = ["python", "hackernews", "stackoverflow", "react","java"]
+  // const [results, setResults] = useState<HackerNewsItem[]>([]);
 
   const [currentView, setCurrentView] = useState<"default" | "history">("default")
+  
 
-  const Header = () => {
-    // 훅과 변수 선언은 return문 바깥에 위치
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    const loading = useAuthStore((state) => state.loading);
-    const logoutUser = useAuthStore((state) => state.logoutUser);
-    const router = useRouter();
-
-    const [searchValue, setSearchValue] = useState("");
-
-    const handleLogout = async () => {
-      await logoutUser();
-      router.push('/user/login');
-    };
-  }
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -77,47 +71,59 @@ const HomePage: React.FC = () => {
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Database className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-              </div>
-            </div>
+            {/* 로고 영역 */}
+              <Link href="/" className="flex items-center gap-3 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-600 rounded-lg">
+                    <Database className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
+                    <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
+                  </div>
+                </div>
+               </Link>
+              {/* 버튼 그룹 */}
             <div className="flex items-center gap-4 text-sm text-gray-600">
-              {isLoggedIn ? (
-                  <button
-                      onClick={handleLogout}
-                      className="text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer p-0"
-                  >
-                    로그아웃
-                  </button>
-              ) : (
-                  <Link href="/user/login" className="text-gray-600 hover:text-gray-900 transition-colors">
-                    로그인
-                  </Link>
-              )}
-              <div className="flex items-center gap-1">
-                <SearchIcon className="w-4 h-4" />
-                <span>검색</span>
-              </div>
-              <div className="flex items-center gap-1">
+               <Button
+                  variant={pathname === '/' ? 'default' : 'ghost'}
+                  onClick={() => router.push('/')}
+                  className="flex items-center gap-1"
+                >
+                  <SearchIcon className="w-4 h-4" />
+                  검색
+                </Button>
+                {isLoggedIn ? (
+                    <button
+                        onClick={handleLogout}
+                        className="text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer p-0"
+                    >
+                        로그아웃
+                    </button>
+                ) : (
+                    <Link href="/user/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+                        로그인
+                    </Link>
+                )}
+              <Button
+                variant="ghost"
+                className="flex items-center gap-1"
+                onClick={() => {
+                  /* 예: API 문서로 이동하거나 모달 띄움 */
+                }}
+              >
                 <Code className="w-4 h-4" />
-                <span>API 문서</span>
-              </div>
-              
-               
-                <Button
-                    variant={currentView === "history" ? "default" : "ghost"}
-                    onClick={() => setCurrentView("history")}
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    수집 이력
-                  </Button>
+                API 문서
+              </Button>
 
+              <Button
+                variant={pathname === '/history' ? 'default' : 'ghost'}
+                onClick={() => router.push('/history')}
+                className="flex items-center gap-1"
+              >
+                <History className="w-4 h-4" />
+                수집 이력
+              </Button>
                   
               
             </div>
@@ -126,6 +132,7 @@ const HomePage: React.FC = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {!query && <PingTest />}
         {/* 검색 영역 */}
         <div className="text-center mb-12">
           {!query && (
@@ -158,6 +165,8 @@ const HomePage: React.FC = () => {
           )}
         </div>
 
+
+
         {/* 검색 결과 */}
         {query && (
           <div className="mb-8">
@@ -179,6 +188,12 @@ const HomePage: React.FC = () => {
                 </div>
               )}
             </div>
+
+
+
+
+
+
 
             {/* 로딩 표시 */}
             {loading && (
@@ -211,7 +226,10 @@ const HomePage: React.FC = () => {
             {!loading && !error && results.length > 0 && (
               <div className="space-y-6">
                 {results.map((result) => (
-                  <SearchResultCard key={result.id} result={result} onSwaggerClick={handleSwaggerClick} />
+                <SearchResultCard
+                    key={`${result.source ?? 'unknown'}-${result.id ?? result.url ?? result.link ?? Math.random()}`}
+                    result={result}
+                    onSwaggerClick={handleSwaggerClick}                  />
                 ))}
               </div>
             )}
@@ -241,6 +259,7 @@ const HomePage: React.FC = () => {
             )}
           </div>
         )}
+
 
         {/* 서비스 소개 (검색 전에만 표시) */}
         {!query && (

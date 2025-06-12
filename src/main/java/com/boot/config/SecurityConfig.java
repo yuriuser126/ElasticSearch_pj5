@@ -1,29 +1,3 @@
-//package com.boot.config;
-//
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.Customizer;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.web.SecurityFilterChain;
-//
-//@Configuration
-//public class SecurityConfig {
-//
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//    	System.out.println("✅ SecurityConfig 적용됨");
-//    	http
-//
-//            .csrf(csrf -> csrf.disable())
-//            .authorizeHttpRequests(auth -> auth
-//                .requestMatchers("/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends").permitAll() // api/ping 인증 없이 허용
-//                .anyRequest().authenticated() // 나머지 요청은 인증 필요
-//            )
-//            .httpBasic(Customizer.withDefaults()); // 기본 인증 방식 활성화
-//
-//        return http.build();
-//    }
-//}
 package com.boot.config;
 
 import com.boot.z_config.security.jwt.JwtAuthenticationFilter;
@@ -37,6 +11,7 @@ import com.boot.z_config.security.CustomAuthenticationFailureHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -47,10 +22,29 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    // Swagger 및 정적 리소스 허용 경로
+    private static final String[] SWAGGER_PERMIT_ALL_URLS = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
+
+    private static final String[] STATIC_HTML_PERMIT_ALL_URLS = {
+            "/*.html",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico"
+    };
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -80,18 +74,29 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println("✅ SecurityConfig 적용됨 - 병합 설정");
+
         http
-                .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
+                        // API 및 인증 없는 경로
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/stackoverflow/fetch/elastic/one"
+                        ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/stackoverflow/**"
+                        ).permitAll()
                         .requestMatchers(
                                 "/user/login", "/user/register", "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**",
                                 "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
-                                "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends"
-
+                                "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping", "/es/**",
+                                "/hackernews/**", "/api/stackoverflow/**", "/questions", "/api/trends"
                         ).permitAll()
+                        .requestMatchers(SWAGGER_PERMIT_ALL_URLS).permitAll()
+                        .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll()
                         .requestMatchers("/user/me").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -116,10 +121,23 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                 )
                 .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
+    }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://localhost:8485");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
+        configuration.setAllowCredentials(true);
 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

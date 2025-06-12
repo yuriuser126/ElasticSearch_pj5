@@ -37,7 +37,7 @@ public class WebConfig implements WebMvcConfigurer {
          * 필요에 따라 허용 메서드, 헤더 등을 세밀하게 조절 가능
          */
     	
-        registry.addMapping("/**") // React 앱이 호출할 모든 API 경로에 대해 CORS 허용 (예: /api로 시작하는 모든 경로)
+        registry.addMapping("/api/**") // React 앱이 호출할 모든 API 경로에 대해 CORS 허용 (예: /api로 시작하는 모든 경로)
         		.allowedOrigins(
     				    "http://localhost:3000", // React 개발 서버의 주소 (정확한 포트 번호 확인)
                         "http://localhost:8485",
