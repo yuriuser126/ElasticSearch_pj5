@@ -82,6 +82,7 @@ public class ElasticController {
    
     	}
     
+    // 여기 수정
     @Operation(summary = "상위 키워드 조회", description = "Stack Overflow 질문 태그 중 가장 빈도가 높은 Top 10 키워드를 조회합니다.")
     @GetMapping("/top-keywords")
     public List<Map<String, Object>> getTopKeywords() throws IOException {

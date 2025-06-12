@@ -44,7 +44,7 @@ public class SecurityConfig {
 //            		 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
             		 "/api/es/**","/hackernews/**","/api/stackoverflow/**","/questions",
             	     "/api/convert/**",
-                     "/test", "/reddit/**").permitAll() // 이 경로는 MainController를 통해 index.html을 반환
+                     "/test", "/reddit/**","/error").permitAll() // 이 경로는 MainController를 통해 index.html을 반환
             	       // 인증 없이 허용
              .anyRequest().authenticated() // 그 외는 인증 필요
          )
