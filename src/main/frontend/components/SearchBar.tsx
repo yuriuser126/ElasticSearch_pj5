@@ -94,11 +94,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, loading = false, classN
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">전체</option>
-                <option value="정부">정부</option>
-                <option value="교통">교통</option>
-                <option value="기상">기상</option>
-                <option value="통계">통계</option>
-                <option value="관광">관광</option>
+                <option value="stackoverflow">stackoverflow</option>
+                <option value="hackernews">hackernews</option>
+                <option value="reddit">reddit</option>
+                <option value="frontend">frontend</option>
+                <option value="backend">backend</option>
               </select>
             </div>
 

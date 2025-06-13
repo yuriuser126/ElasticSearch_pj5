@@ -11,9 +11,21 @@ import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
+
 import Link from "next/link";
 import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
 import { useRouter } from 'next/navigation';
+
+import { useRouter, usePathname } from 'next/navigation'; 
+import Link from 'next/link';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+
+
+
+
+
+
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,7 +40,14 @@ async function pingServer() {
 }
 
 
+// export default function HomePage() {
+  // ① 뷰 상태 선언
+  // const [currentView, setCurrentView] = useState<"search"|"history">("search")
+
+
 const HomePage: React.FC = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { results, loading, error, query, totalResults, searchTime, search } = useSearch()
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showSwaggerModal, setShowSwaggerModal] = useState(false)
@@ -53,9 +72,15 @@ const HomePage: React.FC = () => {
     setShowSwaggerModal(true)
   }
 
-  const popularKeywords = ["교통", "날씨", "인구", "관광", "공공데이터", "API"]
+  const popularKeywords = ["python", "hackernews", "stackoverflow", "react","java"]
+  // const [results, setResults] = useState<HackerNewsItem[]>([]);
+
+ 
+
+
 
   const [currentView, setCurrentView] = useState<"default" | "history">("default")
+
 
   const Header = () => {
     // 훅과 변수 선언은 return문 바깥에 위치
@@ -74,6 +99,7 @@ const HomePage: React.FC = () => {
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -126,6 +152,10 @@ const HomePage: React.FC = () => {
         </div>
       </header>
 
+     
+      <Header />
+
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!query && <PingTest />}
         {/* 검색 영역 */}
@@ -159,6 +189,8 @@ const HomePage: React.FC = () => {
             </div>
           )}
         </div>
+ 
+
 
         {/* 검색 결과 */}
         {query && (
@@ -212,8 +244,12 @@ const HomePage: React.FC = () => {
             {/* 검색 결과 목록 */}
             {!loading && !error && results.length > 0 && (
               <div className="space-y-6">
-                {results.map((result) => (
-                  <SearchResultCard key={result.id} result={result} onSwaggerClick={handleSwaggerClick} />
+                {results.map((result, index) => (
+                  <SearchResultCard
+                    key={`${result.source ?? 'unknown'}-${result.id ?? index}`}
+                    result={result}
+                    onSwaggerClick={handleSwaggerClick}
+                  />
                 ))}
               </div>
             )}
@@ -243,6 +279,7 @@ const HomePage: React.FC = () => {
             )}
           </div>
         )}
+      
 
         {/* 서비스 소개 (검색 전에만 표시) */}
         {!query && (
@@ -279,16 +316,9 @@ const HomePage: React.FC = () => {
       {/* Swagger 모달 */}
       <SwaggerModal result={selectedResult} isOpen={showSwaggerModal} onClose={() => setShowSwaggerModal(false)} />
 
-      {/* 푸터 */}
-      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>© 2024 OpenData API Search. 기술 키워드 기반 오픈 데이터 검색 플랫폼</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
 
-export default HomePage
+export default HomePage 
