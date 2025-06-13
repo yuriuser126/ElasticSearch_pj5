@@ -44,6 +44,7 @@ interface FormData {
   userZipCode: string
   userAddress: string
   userDetailAddress: string
+  developerType: string
 }
 
 export default function UserJoinPage() {
@@ -59,6 +60,7 @@ export default function UserJoinPage() {
     userZipCode: "",
     userAddress: "",
     userDetailAddress: "",
+    developerType: "",
   })
 
   // 약관 동의 상태
@@ -340,6 +342,7 @@ export default function UserJoinPage() {
           form.userBirth &&
           form.userZipCode &&
           form.userAddress &&
+          form.developerType &&
           !passwordMatchError
         )
       default:
@@ -805,6 +808,157 @@ useEffect(() => {
                       className="h-12"
                     />
                   </div>
+                            {/* 개발자 유형 선택 섹션 */}
+          <div>
+            <Label className="text-sm font-medium mb-2 flex items-center">
+              개발자 유형 <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="frontend"
+                  name="developerType"
+                  value="frontend"
+                  checked={form.developerType === "frontend"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                  required
+                />
+                <label
+                  htmlFor="frontend"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-blue-600"
+                    >
+                      <polyline points="16 18 22 12 16 6"></polyline>
+                      <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">프론트엔드</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="backend"
+                  name="developerType"
+                  value="backend"
+                  checked={form.developerType === "backend"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="backend"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-green-600"
+                    >
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">백엔드</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="fullstack"
+                  name="developerType"
+                  value="fullstack"
+                  checked={form.developerType === "fullstack"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="fullstack"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-purple-600"
+                    >
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">풀스택</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="other"
+                  name="developerType"
+                  value="other"
+                  checked={form.developerType === "other"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="other"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-amber-600"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">기타</span>
+                </label>
+              </div>
+            </div>
+          </div>
                 </div>
 
                 {error && (

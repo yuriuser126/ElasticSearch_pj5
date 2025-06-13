@@ -17,6 +17,7 @@ public class BasicUserDTO {
     private String userZipCode;
     private String userAddress;
     private String userDetailAddress;
+    private String developerType;
     private int userAdmin;
     private String userRegdate;
     

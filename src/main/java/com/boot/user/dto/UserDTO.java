@@ -21,6 +21,7 @@ public class UserDTO {
 	private String userBirth;
 	private String userZipCode;
 	private String userAddress;
+	private String developerType;
 	@JsonIgnore
 	private String userDetailAddress = "";
 	private int userAdmin;
