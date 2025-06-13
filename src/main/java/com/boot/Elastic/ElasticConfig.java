@@ -10,7 +10,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Arrays;
 
 @Component
@@ -23,7 +23,7 @@ public class ElasticConfig {
     @PostConstruct
     public void init() {
         RestClientBuilder builder = RestClient.builder(
-                new HttpHost("localhost", 9200, "https")
+                new HttpHost("192.168.10.29", 9200, "https")
         ).setHttpClientConfigCallback(httpClientBuilder ->
                 httpClientBuilder.setDefaultHeaders(Arrays.asList(
                         new BasicHeader("Authorization", "ApiKey " + apiKey)
