@@ -231,8 +231,8 @@ const HistoryPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredHistory.map((item) => (
-                      <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                    {filteredHistory.map((item, idx) => (
+                      <tr key={item.id || idx} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{item.datasetName}</div>
@@ -254,7 +254,7 @@ const HistoryPage: React.FC = () => {
                             {item.collectedAt}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{item.recordCount.toLocaleString()}건</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{(item.recordCount ?? 0).toLocaleString()}건</td>
                         <td className="px-6 py-4 text-sm text-gray-900">{item.fileSize}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
@@ -272,8 +272,48 @@ const HistoryPage: React.FC = () => {
                                 <Download className="w-4 h-4" />
                               </button>
                             )}
-                            <button className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="삭제">
+                            <button className="p-1 text-gray-400 hover:text-red-600 transition-colors" title="삭제"
+                                    onClick={async () => {
+                                      // userId는 로그인 정보에서, datasetName은 해당 row의 값에서 가져옴
+                                      try {
+                                        // 사용자 정보 요청
+                                        const userRes = await fetch("http://localhost:8485/user/me", {
+                                          method: "GET",
+                                          credentials: "include",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          }
+                                        });
+                                        if (!userRes.ok) {
+                                          alert("로그인이 필요합니다.");
+                                          return;
+                                        }
+                                        const user = await userRes.json();
+
+                                        const res = await fetch("http://localhost:8485/api/favorite", {
+                                          method: "DELETE",
+                                          credentials: "include",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                          },
+                                          body: JSON.stringify({
+                                            userId: user.userId, // 로그인 사용자 ID
+                                            title: item.datasetName, // 현재 행의 datasetName을 TITLE로 사용
+                                          }),
+                                        });
+                                        if (res.ok) {
+                                          alert("삭제되었습니다.");
+                                          // 삭제 후 목록 새로고침 등 추가
+                                          refetch();
+                                        } else {
+                                          alert("삭제 실패");
+                                        }
+                                      } catch (err) {
+                                        alert("네트워크 오류: " + err);
+                                      }
+                                    }}>
                               <Trash2 className="w-4 h-4" />
+
                             </button>
                           </div>
                         </td>

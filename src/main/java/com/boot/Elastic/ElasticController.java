@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @RestController
@@ -86,6 +89,8 @@ public class ElasticController {
 
         String searchQuery;
         if (query != null && !query.isEmpty()) {
+            //String correctedQuery = correctKoreanTypo(query);
+
             // 서비스 단에서 번역 수행
             searchQuery = elasticService.translate(query);
 
@@ -96,41 +101,46 @@ public class ElasticController {
 
 
         SearchRequest request = SearchRequest.of(s -> s
-            .index("mydb.*")  // 정확한 인덱스로 고정하는 것이 더 안전
-            .size(20)
-            .query(q -> {
-                if (searchQuery == null || searchQuery.isEmpty()) {
-                    log.info("elastic controller : "+searchQuery);
-                    return q.matchAll(m -> m);
-                } else {
-                    log.info("elastic controller2 : "+searchQuery);
-                    return q.bool(b -> b
-                            .should(m -> m.multiMatch(mm -> mm
-                                    .fields("title^5", "body^2", "tags")
-                                    .query(searchQuery)
-                                    .type(TextQueryType.BestFields)
-                                    .fuzziness("AUTO")
-                                    .operator(Operator.Or)
-                                    .minimumShouldMatch("70%")
+                .index("mydb.*")  // 정확한 인덱스로 고정하는 것이 더 안전
+                .size(20)
+                .query(q -> {
+                    if (searchQuery == null || searchQuery.isEmpty()) {
+                        log.info("elastic controller : " + searchQuery);
+                        return q.matchAll(m -> m);
+                    } else {
+                        log.info("elastic controller2 : " + searchQuery);
+                        return q.bool(b -> b
+                                .should(m -> m.multiMatch(mm -> mm
+                                        .fields("title^5", "body^2", "tags")
+                                        .query(searchQuery)
+                                        .type(TextQueryType.BestFields)
+                                        .fuzziness("AUTO")
+                                        .operator(Operator.Or)
+                                        .minimumShouldMatch("70%")
 
-                            ))
+                                ))
 
-                    );
-                }
-            })
+                        );
+                    }
+                })
         );
 
         SearchResponse<Map> response = client.search(request, Map.class);
 
         return response.hits().hits().stream()
-            .map(hit -> (Map<String, Object>) hit.source())
-            .collect(Collectors.toList());
+                .map(hit -> (Map<String, Object>) hit.source())
+                .collect(Collectors.toList());
+
+
     }
-
-
-    
-
-
+// 한글 교정기 현재 사용 안됨
+//    public String correctKoreanTypo(String text) {
+//
+//        String apiUrl = "http://localhost:5001/correct?text=" + URLEncoder.encode(text, StandardCharsets.UTF_8);
+//        RestTemplate restTemplate = new RestTemplate();
+//        Map<String, String> response = restTemplate.getForObject(apiUrl, Map.class);
+//        return response.get("corrected");
+//    }
 
 }
 

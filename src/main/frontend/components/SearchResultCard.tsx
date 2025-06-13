@@ -3,7 +3,11 @@
 import type React from "react"
 import { ExternalLink, Download, Star, Calendar, Database, Tag, FileText, Code } from "lucide-react"
 import type { SearchResult } from "@/types"
-import { HackerNewsItem } from "@/types"; // `@/types/index.ts`는 index라 생략 가능
+import { HackerNewsItem } from "@/types";
+import {useRouter} from "next/navigation";
+
+
+
 
 interface SearchResultCardProps {
   result: SearchResult
@@ -32,6 +36,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
     result: HackerNewsItem;
     onSwaggerClick: () => void;
     };
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 p-6">
@@ -113,6 +118,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
           </span>
         </div>
 
+
         <div className="flex items-center gap-2">
           {/* Swagger 문서 버튼 */}
           {result.swaggerUrl && (
@@ -124,6 +130,53 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
               API 문서
             </button>
           )}
+
+          <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  // 사용자 정보 요청
+                  const userRes = await fetch("http://localhost:8485/user/me", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                      "Content-Type": "application/json",
+                    }
+                  });
+                  if (!userRes.ok) {
+                    alert("로그인이 필요합니다.");
+                    return;
+                  }
+                  const user = await userRes.json();
+
+                  // 즐겨찾기 등록 요청 보내기
+                  const res = await fetch("http://localhost:8485/api/favorite", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                      userId: user.userId,     // 서버에서 받은 사용자 ID
+                      documentId: result.id,   // 현재 카드의 문서 ID
+                      title: result.title,
+                      url: result.url,
+                    }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert("즐겨찾기에 추가되었습니다!");
+                  } else {
+                    alert("이미 등록되었습니다");
+                  }
+                } catch (err) {
+                  alert("네트워크 오류"+err +"///");
+                }
+              }}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+          >
+            즐겨찾기
+          </button>
 
           {/* 외부 링크 버튼 */}
           <button

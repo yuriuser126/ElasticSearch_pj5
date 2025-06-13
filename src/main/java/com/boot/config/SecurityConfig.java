@@ -93,7 +93,7 @@ public class SecurityConfig {
                                 "/user/login", "/user/register", "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**",
                                 "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
                                 "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping", "/es/**",
-                                "/hackernews/**", "/api/stackoverflow/**", "/questions", "/api/trends"
+                                "/hackernews/**", "/api/stackoverflow/**", "/questions", "/api/trends", "/api/favorite", "/user/**"
                         ).permitAll()
                         .requestMatchers(SWAGGER_PERMIT_ALL_URLS).permitAll()
                         .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll()

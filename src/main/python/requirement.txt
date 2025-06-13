@@ -10,3 +10,6 @@ WARNING: This is a development server. Do not use it in a production deployment.
 Press CTRL+C to quit
 
 warning의 경우 개발용 서버는 실제 운영 환경에서 쓰지 말라는 경고문
+
+오타 검수
+pip install git+https://github.com/Seokhyeon-Park/hanspell.git
