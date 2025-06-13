@@ -78,8 +78,8 @@ public class ElasticController {
         ElasticsearchClient client = elasticConfig.getClient();
 
         SearchRequest request = SearchRequest.of(s -> s
-//    		.index("mydb.*,reddit_items,stackoverflow")  // 여러 인덱스 지정
-    		.index("reddit_items,stackoverflow,hackernews")  // 여러 인덱스 지정
+    		.index("mydb.*")  // 여러 인덱스 지정
+//    		.index("reddit_items,stackoverflow,hackernews")  // 여러 인덱스 지정
             .size(1000)
             .query(q -> {
                 if (query == null || query.isEmpty()) {

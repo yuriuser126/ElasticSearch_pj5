@@ -51,4 +51,6 @@ public class MailController {
 	    response.put("code", code);
 	    return ResponseEntity.ok(response);
 	}
+	
+	
 }

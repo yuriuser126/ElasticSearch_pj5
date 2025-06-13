@@ -175,7 +175,7 @@ export default function UserLoginPage() {
                     로그인 상태 유지
                   </label>
                 </div>
-                <Link href="#" className="text-sm text-blue-600 hover:text-blue-500">
+                <Link href="/user/find-password/" className="text-sm text-blue-600 hover:text-blue-500">
                   비밀번호 찾기
                 </Link>
               </div>
