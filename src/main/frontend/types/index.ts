@@ -42,6 +42,7 @@ export interface SwaggerDoc {
 export interface SearchFilters {
   category?: string
   format?: string
+  page?: number 
   sortBy?: "relevance" | "date" | "popularity"
 }
 

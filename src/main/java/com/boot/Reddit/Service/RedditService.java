@@ -23,11 +23,18 @@ import com.boot.Elastic.ElasticService;
 import com.boot.Reddit.DTO.RedditItem;
 import com.boot.Reddit.Repository.RedditRepository;
 
+import com.boot.Mongodb.Model.Question;
+import com.boot.Mongodb.Repository.QuestionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Service
 public class RedditService {
 	
 	 @Autowired
     private ElasticService elasticService;
+	 
+    @Autowired
+    private QuestionRepository questionRepository;
 
 	// 설정파일(application.properties)에서 Reddit API 인증정보 읽어옴
     @Value("${reddit.client.id}")
@@ -180,4 +187,31 @@ public class RedditService {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * Reddit API에서 핫 게시글 가져와 Question 객체로 변환 후 MongoDB에 저장
+     */
+    public void fetchAndSaveHotPostsAsQuestions(String subreddit, int limit) {
+        Map<String, Object> response = fetchHotPosts(subreddit, limit);
+        if (response == null) return;
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
+        if (children == null || children.isEmpty()) return;
+
+        List<Question> questions = children.stream().map(child -> {
+            Map<String, Object> postData = (Map<String, Object>) child.get("data");
+            Question q = new Question();
+            q.setTitle((String) postData.get("title"));
+            q.setBody((String) postData.get("selftext"));  // Reddit 본문 필드명
+            q.setAuthor((String) postData.get("author"));
+            q.setLink("https://reddit.com" + postData.get("permalink"));
+            q.setTags(null); // Reddit은 태그가 없으므로 null 처리하거나 다른 방법으로 설정 가능
+            q.setSource("Reddit");
+            return q;
+        }).collect(Collectors.toList());
+
+        questionRepository.saveAll(questions);
+    }
 }
+

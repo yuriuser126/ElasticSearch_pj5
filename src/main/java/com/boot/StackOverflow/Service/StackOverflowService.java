@@ -13,8 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.boot.Elastic.ElasticService;
+import com.boot.Mongodb.Model.Question;
+import com.boot.Mongodb.Repository.QuestionRepository;
 import com.boot.StackOverflow.DTO.StackOverflowQuestion;
 import com.boot.StackOverflow.Repository.StackOverflowQuestionRepository;
+
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 
 @Service
@@ -24,6 +30,9 @@ public class StackOverflowService {
     
     @Autowired
     private ElasticService elasticService;
+    
+    @Autowired
+    private QuestionRepository questionRepository;  // ✅ 통합 저장소
 
     @Autowired
     private StackOverflowQuestionRepository repository;
@@ -107,4 +116,45 @@ public class StackOverflowService {
             }
         }
     }
+    
+    public void saveQuestionsToMongo() {
+        String url = "https://api.stackexchange.com/2.3/questions"
+                + "?order=desc"
+                + "&sort=activity"
+                + "&site=stackoverflow"
+                + "&pagesize=10"
+                + "&key=" + apiKey
+                + "&filter=withbody";
+
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            null,
+            new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+
+        Map<String, Object> result = response.getBody();
+
+        if (result == null) return;
+
+        List<Map<String, Object>> items = (List<Map<String, Object>>) result.get("items");
+
+        if (items != null && !items.isEmpty()) {
+            List<Question> questions = items.stream().map(item -> {
+                Question q = new Question();
+                q.setTitle((String) item.get("title"));
+                q.setBody((String) item.get("body"));
+                Map<String, Object> owner = (Map<String, Object>) item.get("owner");
+                q.setAuthor(owner != null ? (String) owner.get("display_name") : "StackOverflow");
+                q.setLink((String) item.get("link"));
+                q.setTags((List<String>) item.get("tags"));
+                q.setSource("StackOverflow");
+                return q;
+            }).collect(Collectors.toList());
+
+            questionRepository.saveAll(questions);
+        }
+    }
+    
+
 }
