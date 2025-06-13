@@ -42,7 +42,7 @@ async function pingServer() {
 
 // export default function HomePage() {
   // ① 뷰 상태 선언
-  const [currentView, setCurrentView] = useState<"search"|"history">("search")
+
 
 
 const HomePage: React.FC = () => {
@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
 
   const popularKeywords = ["python", "hackernews", "stackoverflow", "react","java"]
   // const [results, setResults] = useState<HackerNewsItem[]>([]);
-
+  const [currentView, setCurrentView] = useState<"search"|"history">("search")
  
 
 
