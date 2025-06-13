@@ -20,10 +20,16 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
     window.open(result.url, "_blank", "noopener,noreferrer")
   }
 
+  // const handleSwaggerClick = (e: React.MouseEvent) => {
+  //   e.stopPropagation()
+  //   onSwaggerClick(result)
+  // }
+
   const handleSwaggerClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onSwaggerClick(result)
-  }
+    const url = result.swaggerUrl || "http://localhost:8485/test";
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   // 키워드 배열 준비
   const keywords = (Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || [])
@@ -121,7 +127,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
 
         <div className="flex items-center gap-2">
           {/* Swagger 문서 버튼 */}
-          {result.swaggerUrl && (
+
             <button
               onClick={handleSwaggerClick}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium"
@@ -129,7 +135,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
               <FileText className="w-4 h-4" />
               API 문서
             </button>
-          )}
+
 
           <button
               onClick={async (e) => {

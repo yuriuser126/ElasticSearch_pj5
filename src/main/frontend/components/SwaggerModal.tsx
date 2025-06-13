@@ -270,10 +270,10 @@ fetch('${result.apiEndpoint}/api/v1/data', {
         <div className="bg-gray-100 min-h-96 flex flex-col items-center justify-center p-10">
           <div className="text-center bg-white p-10 rounded-lg shadow-md max-w-2xl">
             <h1 className="text-3xl font-bold text-blue-600 mb-8">
-              🚀 Elasticsearch 데모 애플리케이션 🚀
+              🚀 API Sweagger DEMO Application 🚀
             </h1>
             <p className="text-gray-700 mb-8 leading-relaxed">
-              Elasticsearch를 활용한 데모 서비스입니다. 아래 링크를 통해 API 문서를 확인하거나 명세 파일을 다운로드, 또는 변환기를 사용하세요.
+              Sweagger를 활용한 데모 서비스입니다. 아래 링크를 통해 API 문서를 확인하거나 명세 파일을 다운로드, 또는 변환기를 사용하세요.
             </p>
 
             <div className="flex flex-wrap justify-center gap-3 mb-8">
