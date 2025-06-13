@@ -90,11 +90,11 @@ public class ElasticController {
 
         //Elasticsearch에 보낼 검색 요청 생성
         SearchRequest request = SearchRequest.of(s -> s
-                .index("mydb.questions")// 조회할 인덱스 입력 properties에 mydb로 되어 있어서 일단 이렇게 작성
+                .index("stackoverflow_questions")// 조회할 인덱스 입력 properties에 mydb로 되어 있어서 일단 이렇게 작성
                 .size(0)
                 .aggregations("top_tags", a -> a// top_tags라는 이름으로 집계 요청하기
                         .terms(t -> t
-                                .field("tags.keyword")
+                                .field("tags")
                                 .size(10)// 상위 10개 결과만 요청
                         )
                 )
