@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
 
-import Link from "next/link";
+
 import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
 import { useRouter } from 'next/navigation';
 
-import { useRouter, usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation'; 
 import Link from 'next/link';
-import Header from "@/components/Header";
+
 import Footer from "@/components/Footer";
 
 
@@ -42,7 +42,7 @@ async function pingServer() {
 
 // export default function HomePage() {
   // ① 뷰 상태 선언
-  // const [currentView, setCurrentView] = useState<"search"|"history">("search")
+  const [currentView, setCurrentView] = useState<"search"|"history">("search")
 
 
 const HomePage: React.FC = () => {
@@ -54,7 +54,7 @@ const HomePage: React.FC = () => {
 
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
   const logoutUser = useAuthStore((state) => state.logoutUser);
-  const router = useRouter();
+
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
 
 
@@ -79,7 +79,7 @@ const HomePage: React.FC = () => {
 
 
 
-  const [currentView, setCurrentView] = useState<"default" | "history">("default")
+ 
 
 
   const Header = () => {
@@ -90,6 +90,7 @@ const HomePage: React.FC = () => {
     const router = useRouter();
 
     const [searchValue, setSearchValue] = useState("");
+    // const [currentView, setCurrentView] = useState<"default" | "history">("default")
 
     const handleLogout = async () => {
       await logoutUser();
@@ -99,7 +100,6 @@ const HomePage: React.FC = () => {
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -152,8 +152,8 @@ const HomePage: React.FC = () => {
         </div>
       </header>
 
-     
-      <Header />
+
+
 
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
