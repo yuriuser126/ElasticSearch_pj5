@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { pwdCheckEmail, changePassword, checkUserIdExists } from "@/lib/api/auth"
 import axios from "axios"
+import Header from "@/components/Header"
 
 interface FormData {
   userEmail: string
@@ -210,37 +211,8 @@ const handleCheckId = async () => {
   
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Database className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-              </div>
-            </div>
-            <nav className="flex items-center space-x-6">
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <Search className="w-4 h-4" />
-                <span>검색</span>
-              </Link>
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <FileText className="w-4 h-4" />
-                <span>API 문서</span>
-              </Link>
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <Clock className="w-4 h-4" />
-                <span>수집 이력</span>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+     <div className="min-h-screen bg-gray-50">
+    <Header />
 
       {/* 미리보기 탭 선택 */}
       <div className="bg-white border-b border-gray-200 shadow-sm">

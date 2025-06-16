@@ -102,8 +102,7 @@ const HomePage: React.FC = () => {
 
   
   return (
-
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -117,50 +116,36 @@ const HomePage: React.FC = () => {
                 <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
+
+            {/* 오른쪽 영역 - 가로 정렬 수정 */}
+            <div className="flex items-center gap-4">
               {isLoggedIn ? (
-                  <button
-                      onClick={handleLogout}
-                      className="text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer p-0"
-                  >
-                    로그아웃
-                  </button>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer px-3 py-2 rounded-md hover:bg-gray-100"
+                >
+                  로그아웃
+                </button>
               ) : (
-                  <Link href="/user/login" className="text-gray-600 hover:text-gray-900 transition-colors">
-                    로그인
-                  </Link>
+                <
+                 Link href="/user/login"
+                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer px-3 py-2 rounded-md hover:bg-gray-100"
+                >
+                  로그인
+                </Link>
               )}
-              <div className="flex items-center gap-1">
-                <SearchIcon className="w-4 h-4" />
-                <span>검색</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Code className="w-4 h-4" />
-                <span>API 문서</span>
-              </div>
-              
-               
-                {/* <Button
-                    variant={currentView === "history" ? "default" : "ghost"}
-                    onClick={() => setCurrentView("history")}
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    수집 이력
-                  </Button> */}
 
-                  <Button asChild variant="ghost" className="w-full justify-start"> 
-                    <Link href="/history">
-                     <History className="mr-2 h-4 w-4" /> 수집 이력 </Link> 
-                     </Button>
-
-                  
-              
+              <Button asChild variant="ghost" size="sm" className="flex items-center gap-2">
+                <Link href="/history">
+                  <History className="h-4 w-4" />
+                  수집 이력
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
       </header>
-
+   
 
 
 
