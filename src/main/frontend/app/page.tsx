@@ -20,6 +20,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 import Footer from "@/components/Footer";
+import Header from "@/components/Header"
 
 
 
@@ -78,73 +79,11 @@ const HomePage: React.FC = () => {
  
 
 
-
- 
-
-
-  const Header = () => {
-    // 훅과 변수 선언은 return문 바깥에 위치
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    const loading = useAuthStore((state) => state.loading);
-    const logoutUser = useAuthStore((state) => state.logoutUser);
-    const router = useRouter();
-     const pathname = usePathname();
-
-    const [searchValue, setSearchValue] = useState("");
-    // const [currentView, setCurrentView] = useState<"default" | "history">("default")
-
-    const handleLogout = async () => {
-      await logoutUser();
-      router.push('/user/login');
-    };
-  }
-
-
-  
   return (
+
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Database className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-              </div>
-            </div>
-
-            {/* 오른쪽 영역 - 가로 정렬 수정 */}
-            <div className="flex items-center gap-4">
-              {isLoggedIn ? (
-                <button
-                  onClick={handleLogout}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer px-3 py-2 rounded-md hover:bg-gray-100"
-                >
-                  로그아웃
-                </button>
-              ) : (
-                <
-                 Link href="/user/login"
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors bg-transparent border-none cursor-pointer px-3 py-2 rounded-md hover:bg-gray-100"
-                >
-                  로그인
-                </Link>
-              )}
-
-              <Button asChild variant="ghost" size="sm" className="flex items-center gap-2">
-                <Link href="/history">
-                  <History className="h-4 w-4" />
-                  수집 이력
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <Header />
+    
    
 
 

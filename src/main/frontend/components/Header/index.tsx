@@ -31,7 +31,17 @@ import { useState } from "react";
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+             {/* <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+               */}
+              <div
+                  onClick={() => {
+                    router.push("/")             // 홈으로 이동
+                    setTimeout(() => {
+                      window.location.reload()  // 상태 초기화를 위해 새로고침
+                    }, 50)
+                  }}
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+                >
               <div className="p-2 bg-blue-600 rounded-lg">
                 <Database className="w-6 h-6 text-white" />
               </div>
@@ -39,7 +49,7 @@ import { useState } from "react";
                 <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
                 <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
               </div>
-            </Link>
+            </div>
 
             {/* 오른쪽 영역 - 가로 정렬 수정 */}
             <div className="flex items-center gap-4">
