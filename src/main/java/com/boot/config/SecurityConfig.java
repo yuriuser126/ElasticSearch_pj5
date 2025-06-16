@@ -97,8 +97,8 @@ public class SecurityConfig {
                         .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll() // static HTML 및 리소스 경로
                         .requestMatchers(
                                 "/user/login", "/user/register", "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**",
-                                "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
-                                "/favicon.ico", "/reddit/**", "/api/convert/**", 
+                                "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**", "/pwdMailConfirm", "/changePassword",
+                                "/favicon.ico", "/reddit/**", "/api/convert/**", "/checkId",
                                 "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends",
                                 "/api/stackoverflow/fetch/elastic/one"
 

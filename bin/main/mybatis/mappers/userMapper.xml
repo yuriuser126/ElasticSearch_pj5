@@ -64,8 +64,8 @@
 	<!-- 유저 비밀번호 수정 -->
 	<update id="updateUserPwInfo" parameterType="java.util.HashMap">
 	    UPDATE user_info
-	    SET USERPW = #{encodedPassword}
-	    WHERE USERNUMBER = #{userNumber}
+	    SET userPw = #{encodedPassword}
+	    WHERE userId = #{userId}
 	</update>
 
 	<!-- 회원가입시 아이디 중복 체크 -->

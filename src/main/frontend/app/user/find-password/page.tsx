@@ -20,8 +20,9 @@ import {
   Unlock,
   Eye,
   EyeOff,
+  Check,
 } from "lucide-react"
-import { sendVerificationEmail } from "@/lib/api/auth"
+import { pwdCheckEmail, changePassword, checkUserIdExists } from "@/lib/api/auth"
 import axios from "axios"
 
 interface FormData {
@@ -62,6 +63,12 @@ export default function PasswordRecoveryPreview() {
       const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
       const [loading, setLoading] = useState(false)
       const [emailLoading, setEmailLoading] = useState(false)
+      const [idValid, setIdValid] = useState(false);
+
+      
+  // ID 관련 상태
+  const [idLocked, setIdLocked] = useState(false)
+  const [idLoading, setIdLoading] = useState(false)
 
       // 에러 및 성공 메시지
       const [emailError, setEmailError] = useState("")
@@ -74,13 +81,14 @@ export default function PasswordRecoveryPreview() {
     { id: 1, title: "정보 입력", icon: Mail },
     // { id: 2, title: "인증 확인", icon: CheckCircle },
     { id: 2, title: "새 비밀번호 설정", icon: Lock },
-    { id: 3, title: "새 비밀번호 설정완료", icon: Lock },
+    { id: 3, title: "설정완료", icon: Check },
   ]
 
     const progress = (activeStep / steps.length) * 100
 
-    // 이메일 인증번호 발송
-      const handleSendCode = async () => {
+          // 이메일 인증번호 발송
+    const handleSendCode = async () => {
+
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         if (!emailPattern.test(form.userEmail)) {
           setEmailError("올바른 이메일 주소 형식으로 입력해주세요.")
@@ -95,7 +103,7 @@ export default function PasswordRecoveryPreview() {
 
 
         try {
-          const response = await sendVerificationEmail(form.userEmail)
+          const response = await pwdCheckEmail(form.userEmail)
     
           // 응답 구조 디버깅
           console.log("서버 응답:", response)
@@ -138,9 +146,29 @@ export default function PasswordRecoveryPreview() {
             }
           }
         }
+
+//아이디 확인
+const handleCheckId = async () => {
+  try {
+    const res = await checkUserIdExists(form.userId) // 이렇게 사용
+    if (res.success) {
+      setIdValid(true)
+      setIdLocked(true)
+      setEmailError("")
+    } else {
+      setIdValid(false)
+      setEmailError("존재하지 않는 아이디입니다.")
+    }
+  } catch (err) {
+    console.error("아이디 확인 중 오류:", err)
+    setIdValid(false)
+    setEmailError("아이디 확인 중 오류 발생")
+  }
+}
+
       
   // 인증번호 확인
-  const handleVerifyCode = () => {
+    const handleVerifyCode = () => {
     // 디버깅을 위한 콘솔 로그 추가
     console.log("입력한 인증번호:", verificationCode)
     console.log("서버 인증번호:", serverCode)
@@ -297,18 +325,39 @@ export default function PasswordRecoveryPreview() {
                   <Label htmlFor="userId" className="text-sm font-semibold text-gray-700">
                     아이디 <span className="text-red-500">*</span>
                   </Label>
+                  <div className="flex gap-2">
+                  <div className="relative flex-1">
                   <Input
-                                    id="userId"
-                                    name="userId"
-                                    type="text"
-                                    required
-                                    value={userId}
-                                    onChange={(e) => setUserId(e.target.value)}
-                                    className="h-12 border-gray-200 focus:border-violet-500 focus:ring-violet-500 transition-all duration-200 bg-white/50"
-                                    placeholder="아이디를 입력하세요"
-                                  />
+                      id="userId"
+                      name="userId"
+                      type="text"
+                      required
+                      value={form.userId}
+                      // onChange={(e) => setUserId(e.target.value)}
+                      onChange={handleChange}
+                      className="h-12 border-gray-200 focus:border-violet-500 focus:ring-violet-500 transition-all duration-200 bg-white/50"
+                      placeholder="아이디를 입력하세요"
+                       disabled={idLocked}
+                    />
+                    {idLocked && (
+                      <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    )}
+                  </div>
+                   <Button
+                    type="button"
+                    onClick={handleCheckId}
+                    disabled={idLoading || idLocked || !form.userId}
+                    className="h-12 w-32 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {idLoading ? "확인 중..." : "아이디 확인"}
+                  </Button>
+                </div>
+                   {/* <Button type="button" onClick={handleCheckId} className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white">
+                    아이디 확인
+                  </Button> */}
                   {/* <Input id="userId" placeholder="아이디를 입력하세요" className="h-12" required /> */}
                 </div>
+
 
                 <div className="space-y-2">
                   <Label htmlFor="userEmail" className="text-sm font-semibold text-gray-700">
@@ -324,7 +373,8 @@ export default function PasswordRecoveryPreview() {
                                    onChange={handleChange}
                                    placeholder="example@email.com"
                                    className="h-12 pr-10 border-gray-200 focus:border-violet-500 focus:ring-violet-500 transition-all duration-200 bg-white/50"
-                                   disabled={emailLocked}
+                                  //  disabled={emailLocked}
+                                   disabled={!idValid || emailLocked}
                                  />
                                  {emailLocked ? (
                                    <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -342,6 +392,7 @@ export default function PasswordRecoveryPreview() {
                                </Button>
                   </div>
                 </div>
+        
 
                 {showVerificationInput && !verificationLocked && (
                 <div className="space-y-2">
@@ -472,7 +523,33 @@ export default function PasswordRecoveryPreview() {
           <p className="text-sm text-red-500">{passwordMatchError}</p>
         )}
 
-        <Button
+<Button
+  type="button"
+  onClick={async () => {
+    if (form.userPw === form.pwdConfirm && form.userPw.length >= 8) {
+      try {
+        const res = await changePassword(form.userId, form.userPw);
+        console.log("🔐 전송된 userId:", form.userId);
+        console.log("🔐 전송된 userPw:", form.userPw);
+        if (res.success) {
+          setPasswordChanged(true);
+          setActiveStep(3); // 성공하면 다음 단계로 이동
+        } else {
+          alert("비밀번호 변경에 실패했습니다. 다시 시도해주세요.");
+        }
+      } catch (err: any) {
+        console.error("비밀번호 변경 에러:", err);
+        alert("서버 오류로 인해 비밀번호를 변경할 수 없습니다.");
+      }
+    } else {
+      alert("비밀번호가 일치하지 않거나 형식이 잘못되었습니다.");
+    }
+  }}
+  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
+>
+  비밀번호 변경
+</Button>
+        {/* <Button
           type="button"
           onClick={() => {
             if (form.userPw === form.pwdConfirm && form.userPw.length >= 8) {
@@ -485,7 +562,7 @@ export default function PasswordRecoveryPreview() {
           className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white"
         >
           비밀번호 변경
-        </Button>
+        </Button> */}
       </>
     ) : null}
   </div>
