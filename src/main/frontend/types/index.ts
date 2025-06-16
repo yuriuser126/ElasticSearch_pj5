@@ -2,10 +2,10 @@
 export interface SearchResult {
   id: string
   title: string
-  description: string
+  body: string
   url: string
-  link?: string; 
-  source: string
+  link?: string;
+  _id: string
   tags: string[]    
   keywords: string[]
   category: string

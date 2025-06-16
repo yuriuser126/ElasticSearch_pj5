@@ -26,7 +26,7 @@ export const login = async (credentials: LoginCredentials) => {
   params.append('userPw', credentials.userPw);
 
   const response = await api.post(
-      '/user/login',
+      'http://localhost:8485/user/login',
       params,
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }

@@ -227,7 +227,7 @@ const HomePage: React.FC = () => {
               <div className="space-y-6">
                 {results.map((result) => (
                 <SearchResultCard
-                    key={`${result.source ?? 'unknown'}-${result.id ?? result.url ?? result.link ?? Math.random()}`}
+                    key={`${result._id ?? 'unknown'}-${result.id ?? result.url ?? result.link ?? Math.random()}`}
                     result={result}
                     onSwaggerClick={handleSwaggerClick}                  />
                 ))}

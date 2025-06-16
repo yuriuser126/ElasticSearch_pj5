@@ -7,7 +7,7 @@ app = Flask(__name__)
 def get_trends():
     keywords = request.args.getlist('keyword')
     if not keywords:
-        keywords = ['React', 'Docker', 'Python']
+        keywords = ['React', 'Docker', 'Python', 'Java', 'Spring']
     if len(keywords) > 5:
         return jsonify({'error': '최대 5개 키워드만 비교할 수 있습니다.'}), 400
     pytrends = TrendReq(hl='ko', tz=540)
@@ -19,4 +19,4 @@ def get_trends():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(port=5001)

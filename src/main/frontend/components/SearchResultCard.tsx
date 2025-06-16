@@ -17,7 +17,8 @@ interface SearchResultCardProps {
 const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerClick }) => {
   const handleExternalLink = (e: React.MouseEvent) => {
     e.stopPropagation()
-    window.open(result.url, "_blank", "noopener,noreferrer")
+    const url = result.link || "http://localhost:3000";
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   // const handleSwaggerClick = (e: React.MouseEvent) => {
@@ -70,7 +71,11 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
       </div>
 
       {/* 설명 */}
-      <p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">{result.description}</p>
+      {/*<p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">{result.description}</p>*/}
+      <p
+          className="text-gray-700 mb-4 line-clamp-3 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: result.body }}
+      />
 
       {/* 키워드 태그 */}
       <div className="flex flex-wrap gap-2 mb-4">

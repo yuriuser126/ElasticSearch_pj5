@@ -36,6 +36,7 @@ export const useSearch = () => {
 
 
       console.log("검색 실행됨", searchQuery);
+      console.log("필터 실행됨", searchFilters);
       // Elasticsearch API 호출
       const response = await axios.get(`${baseURL}/es/questions`, {
         params: { query: searchQuery, ...searchFilters },
