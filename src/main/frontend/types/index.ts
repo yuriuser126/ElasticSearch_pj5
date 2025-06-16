@@ -43,6 +43,7 @@ export interface SearchFilters {
   category?: string
   format?: string
   page?: number 
+  size?: number
   sortBy?: "relevance" | "date" | "popularity"
 }
 
@@ -57,6 +58,7 @@ export interface CollectionHistory {
   source: string
   error?: string
 }
+
 export interface HackerNewsItem {
   id?: number;
   by: string;

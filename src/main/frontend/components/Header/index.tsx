@@ -26,6 +26,12 @@ const Header = () => {
             </div>
           </Link>
 
+        
+
+
+
+
+
           {/* 버튼 그룹 */}
           <div className="flex items-center gap-4 text-sm text-gray-600">
             <Button

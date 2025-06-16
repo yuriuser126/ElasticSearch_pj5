@@ -72,15 +72,23 @@ public class ElasticController {
         }
     }
     
+    // GET http://localhost:8080/es/questions?query=java&page=2&size=5
     @Operation(summary = "모든 질문 조회 또는 검색", description = "query 파라미터가 있으면 검색, 없으면 전체 조회합니다.")
     @GetMapping("/questions")
-    public Object getOrSearchQuestions(@RequestParam(name = "query", required = false) String query) throws IOException {
-        ElasticsearchClient client = elasticConfig.getClient();
+    public Object getOrSearchQuestions
+    	(@RequestParam(name = "query", required = false) String query,
+    	@RequestParam(name = "page", defaultValue = "1") int page,
+    	@RequestParam(name = "size", defaultValue = "10") int size
+	
+    	) throws IOException {
+    	ElasticsearchClient client = elasticConfig.getClient();
+    	
+    	int from = (page - 1) * size;
 
         SearchRequest request = SearchRequest.of(s -> s
-//    		.index("mydb.*,reddit_items,stackoverflow")  // 여러 인덱스 지정
-    		.index("reddit_items,stackoverflow,hackernews")  // 여러 인덱스 지정
-            .size(1000)
+    		.index("mydb.questions","mydb.hackernews","mydb.stackreddit")  // 여러 인덱스 지정
+    		.from(from) // 'from' 값으로 페이징 시작 위치 지정
+    		.size(size) // 한 페이지에 보여줄 결과 개수 지정
             .query(q -> {
                 if (query == null || query.isEmpty()) {
                     return q.matchAll(m -> m);
@@ -94,18 +102,28 @@ public class ElasticController {
         );
 
         SearchResponse<Map> response = client.search(request, Map.class);
-
-        return response.hits().hits().stream()
+        
+        // 총 검색 결과 개수
+        long total = response.hits().total().value();
+        
+        // 검색 결과 리스트
+        List<Map<String, Object>> hits = response.hits().hits().stream()
             .map(hit -> (Map<String, Object>) hit.source())
             .collect(Collectors.toList());
+
+     // 응답에 결과 + 전체 개수 같이 보내기 (Map이나 DTO로 감싸서)
+        return Map.of(
+            "results", hits,
+            "total", total
+        );
     }
-
-
-    
-
-
-
 }
+
+		/*요청받은 페이지 번호와 페이지 크기를 기반으로
+		Elasticsearch 검색에서 사용할 'from' 값을 계산합니다.
+		'from'은 검색 결과에서 몇 번째 문서부터 가져올지를 의미합니다.
+		예를 들어, page=2, size=10 이면 from = (2 - 1) * 10 = 10 이 되어
+		11번째 문서부터 결과를 가져오게 됩니다.*/
 
 
 
