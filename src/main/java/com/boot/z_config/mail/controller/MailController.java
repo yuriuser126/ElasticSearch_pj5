@@ -51,4 +51,16 @@ public class MailController {
 	    response.put("code", code);
 	    return ResponseEntity.ok(response);
 	}
+
+	@RequestMapping({"/pwdMailConfirm"})
+	@ResponseBody
+	public ResponseEntity<?> pwdMailConfirm(@RequestParam("email") String email) throws Exception {
+		System.out.println("비밀번호 재설정 이메일 인증 요청: " + email);
+		String code = this.mailService.sendSimpleMessage(email);
+		System.out.println("인증코드: " + code);
+		Map<String, Object> response = new HashMap();
+		response.put("success", true);
+		response.put("code", code);
+		return ResponseEntity.ok(response);
+	}
 }
