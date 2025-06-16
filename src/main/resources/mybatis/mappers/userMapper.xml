@@ -1,0 +1,80 @@
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.boot.user.dao.UserDAO">
+<!--이메일체크-->
+<select id="checkEmail" parameterType="String" resultType="Integer">
+    SELECT COUNT(*) FROM user_info WHERE userEmail = #{userEmail}
+</select>
+<!--	 회원가입 -->
+<!--	<insert id="userJoin">-->
+<!--		INSERT INTO user_info (-->
+<!--		userNumber, userId, userPw,-->
+<!--		userName, userTel,-->
+<!--		userEmail, userBirth, userZipCode, userAddress,-->
+<!--		userDetailAddress-->
+<!--		)-->
+<!--		VALUES (-->
+<!--		(SELECT NVL(MAX(userNumber), 0) + 1 FROM-->
+<!--		user_info),-->
+<!--		#{userId}, #{userPw}, #{userName}, #{userTel},-->
+<!--		#{userEmail},-->
+<!--		#{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}-->
+<!--		)-->
+
+<!--	</insert>-->
+
+	<insert id="userJoin">
+    INSERT INTO user_info (
+        userId, userPw, userName, userTel,
+        userEmail, userBirth, userZipCode, userAddress,
+        userDetailAddress, developerType
+    ) VALUES (
+        #{userId}, #{userPw}, #{userName}, #{userTel},
+        #{userEmail}, #{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}, #{developerType}
+    )
+</insert>
+
+	<!-- 로그인 -->
+	<select id="userLogin"
+		resultType="com.boot.user.dto.UserDTO">
+		select userid, userPw from user_info where userId=#{userId}
+	</select>
+
+	<!-- 유저 정보 가져오기 -->
+	<select id="getUserInfo"
+		resultType="com.boot.user.dto.UserDTO">
+		select userNumber, userId, userPw, userName, userTel,
+		userEmail,
+		userBirth, userZipCode, userAddress, userDetailAddress,
+		userAdmin, userRegdate from
+		user_info where userId=#{userId}
+	</select>
+
+	<!-- 유저 정보 수정 -->
+	<update id="updateUserInfo"> update user_info set userNumber=#{userNumber},
+		userId=#{userId}, userName=#{userName}, userTel=#{userTel} ,
+		userEmail=#{userEmail}, userZipCode=#{userZipCode},
+		userAddress=#{userAddress}, userDetailAddress=#{userDetailAddress}
+		where userNumber=#{userNumber}
+	</update>
+
+	<!-- 유저 비밀번호 수정 -->
+	<update id="updateUserPwInfo" parameterType="java.util.HashMap">
+	    UPDATE user_info
+	    SET USERPW = #{encodedPassword}
+		WHERE USERID = #{userId}
+	</update>
+
+	<!-- 회원가입시 아이디 중복 체크 -->
+	<select id="checkId" resultType="com.boot.user.dto.UserDTO">
+		select userId from user_info
+		where userId=#{userId}
+	</select>
+	
+	<select id="findByUserId" parameterType="string" resultType="com.boot.user.dto.UserDTO">
+    	SELECT * FROM user_info WHERE userId = #{userId}
+	</select>
+</mapper>
+

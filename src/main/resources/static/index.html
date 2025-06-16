@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 애플리케이션 메인 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex; /* 버튼들을 가로로 정렬하고 중앙 정렬을 위해 flex 사용 */
+            flex-wrap: wrap; /* 버튼이 많아지면 다음 줄로 넘어가도록 설정 */
+            justify-content: center; /* 버튼들을 중앙으로 정렬 */
+            gap: 10px; /* 버튼 사이의 간격 */
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            /* margin: 10px; */ /* gap으로 대체 */
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button-swagger {
+            background-color: #28a745; /* 초록색 계열 */
+        }
+        .button-swagger:hover {
+            background-color: #1e7e34;
+        }
+        .button-download {
+            background-color: #17a2b8; /* 청록색 계열 */
+        }
+        .button-download:hover {
+            background-color: #117a8b;
+        }
+        .button-converter {
+            background-color: #ffc107; /* 노란색 계열 (경고색과 유사하나 의미 다름) */
+            color: #212529; /* 어두운 텍스트 색상 */
+        }
+        .button-converter:hover {
+            background-color: #e0a800;
+        }
+        p {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Elastic search 애플리케이션 🚀</h1>
+        <p>Elastic search를 활용한 서비스입니다. 아래 링크를 통해 API 문서를 확인하거나 명세 파일을 다운로드, 또는 변환기를 사용하세요.</p>
+
+        <div class="button-group">
+            <a href="/swagger-ui.html" class="button button-swagger" target="_blank">Swagger API 문서 보기</a>
+            <a href="/v3/api-docs" class="button button-download" download="openapi-spec.json">OpenAPI Spec 다운로드 (JSON)</a>
+            <a href="/openapi-converter.html" class="button button-converter" target="_blank">OpenAPI 포맷 변환기</a>
+        </div>
+
+        <p>애플리케이션 버전: v1.0.2</p>
+    </div>
+</body>
+</html>

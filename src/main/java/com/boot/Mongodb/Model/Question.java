@@ -17,5 +17,4 @@ public class Question {
     private String link;
 
     private List<String> tags;
-
 }

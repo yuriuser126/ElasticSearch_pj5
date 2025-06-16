@@ -1,86 +1,117 @@
 "use client"
 
-import React from "react"
-import { useState } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Database, SearchIcon, Code, TrendingUp } from "lucide-react"
 import SearchBar from "@/components/SearchBar"
 import SearchResultCard from "@/components/SearchResultCard"
 import SwaggerModal from "@/components/SwaggerModal"
+// import PingTest from "@/components/PingTest";
 import { useSearch } from "@/hooks/useSearch"
 import { Button } from "@/components/ui/button"
 import type { SearchResult } from "@/types"
 import { History } from "lucide-react";
 
+
+import useAuthStore from '@/store/authStore'; // Zustand 스토어 임포트
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import PaginationComponent from '@/components/PaginationComponent'; // PaginationComponent 임포트!
+
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-async function pingServer() {
-  try {
-    const res = await fetch(`${apiUrl}/ping`);
-    const text = await res.text();
-    console.log('서버 응답:', text);
-  } catch (error) {
-    console.error('서버 연결 실패:', error);
-  }
-}
+const RESULTS_PER_PAGE = 10; // 한 페이지당 보여줄 결과 수 (이 값은 백엔드와 일치해야 합니다)
+
+// async function pingServer() {
+//   try {
+//     const res = await fetch(`${apiUrl}/ping`);
+//     const text = await res.text();
+//     console.log('서버 응답:', text);
+//   } catch (error) {
+//     console.error('서버 연결 실패:', error);
+//   }
+// }
+
+
+// export default function HomePage() {
+  // ① 뷰 상태 선언
+
+
 
 const HomePage: React.FC = () => {
-  const { results, loading, error, query, totalResults, searchTime, search } = useSearch()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams(); // searchParams 훅 사용
+
+  // URL에서 초기 검색어와 페이지 추출
+  const initialQuery = searchParams.get('q') || '';
+  const initialPage = parseInt(searchParams.get('page') || '1', 10);
+
+  // useSearch 훅으로부터 필요한 값들을 가져옵니다.
+  // useSearch 훅이 query와 page를 인자로 받아 내부적으로 데이터 페칭을 수행한다고 가정합니다.
+  const { results, loading, error, query, totalResults, searchTime, search } = useSearch(initialQuery);
+
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showSwaggerModal, setShowSwaggerModal] = useState(false)
+
+  const currentPage = initialPage; // URL의 page 파라미터를 현재 페이지로 사용
+
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+  const logoutUser = useAuthStore((state) => state.logoutUser);
+
+  const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
+
+
+  React.useEffect(() => {
+    checkAuthStatus(); // 앱이 마운트될 때 로그인 상태 확인
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push('/user/login');
+  };
 
   const handleSwaggerClick = (result: SearchResult) => {
     setSelectedResult(result)
     setShowSwaggerModal(true)
   }
 
-  const popularKeywords = ["교통", "날씨", "인구", "관광", "공공데이터", "API"]
+  const popularKeywords = ["python", "hackernews", "stackoverflow", "react","java"]
+  // const [results, setResults] = useState<HackerNewsItem[]>([]);
 
-  const [currentView, setCurrentView] = useState<"default" | "history">("default")
-  
+ // 총 페이지 수 계산
+  const totalPages = Math.ceil(totalResults / RESULTS_PER_PAGE);
+
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback((page: number) => {
+    console.log("📄 페이지 변경 요청:", page, "범위:", `1-${totalPages}`);
+  const [currentView, setCurrentView] = useState<"search"|"history">("search")
+
+
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      console.log("✅ 페이지 변경 승인:", page);
+      // URL 업데이트만 하고, useSearch 훅이 URL 변경을 감지하여 다시 검색하도록 합니다.
+      const newUrl = `${pathname}?q=${encodeURIComponent(query)}&page=${page}`;
+      router.push(newUrl); // push 대신 replace를 사용할 수도 있습니다. (뒤로가기 스택 관리 방식에 따라 선택)
+    } else {
+      console.log("❌ 페이지 변경 거부:", {
+        page,
+        valid: page >= 1 && page <= totalPages,
+        different: page !== currentPage
+      });
+    }
+  }, [currentPage, totalPages, query, pathname, router]);
+
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      {/* 헤더 */}
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-600 rounded-lg">
-                <Database className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <SearchIcon className="w-4 h-4" />
-                <span>검색</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Code className="w-4 h-4" />
-                <span>API 문서</span>
-              </div>
-              
-               
-                <Button
-                    variant={currentView === "history" ? "default" : "ghost"}
-                    onClick={() => setCurrentView("history")}
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    수집 이력
-                  </Button>
 
-                  
-              
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50">
+    <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* {!query && <PingTest />} */}
         {/* 검색 영역 */}
         <div className="text-center mb-12">
           {!query && (
@@ -112,6 +143,8 @@ const HomePage: React.FC = () => {
             </div>
           )}
         </div>
+ 
+
 
         {/* 검색 결과 */}
         {query && (
@@ -165,8 +198,12 @@ const HomePage: React.FC = () => {
             {/* 검색 결과 목록 */}
             {!loading && !error && results.length > 0 && (
               <div className="space-y-6">
-                {results.map((result) => (
-                  <SearchResultCard key={result.id} result={result} onSwaggerClick={handleSwaggerClick} />
+                {results.map((result, index) => (
+                  <SearchResultCard
+                    key={`${result.source ?? 'unknown'}-${result.id ?? index}`}
+                    result={result}
+                    onSwaggerClick={handleSwaggerClick}
+                  />
                 ))}
               </div>
             )}
@@ -194,8 +231,28 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             )}
+
+             {/* 검색 결과가 있거나, 총 결과가 0보다 클 때만 페이지네이션을 표시하는 조건 */}
+            {query && !loading && !error && totalPages > 1 && (
+              <div className="mt-8 flex justify-center flex-col items-center"> {/* 중앙 정렬을 위해 flex justify-center 추가 */}
+                <div className="text-center mb-4 text-sm text-gray-600">
+                  페이지 {currentPage} / {totalPages} (총 {totalResults.toLocaleString()}개 결과)
+                </div>
+
+                <PaginationComponent
+                  currentPage={currentPage}
+                  maxPage={totalPages} // MAX_PAGE 대신 계산된 totalPages 사용
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+
+
+
+
           </div>
         )}
+      
 
         {/* 서비스 소개 (검색 전에만 표시) */}
         {!query && (
@@ -232,14 +289,7 @@ const HomePage: React.FC = () => {
       {/* Swagger 모달 */}
       <SwaggerModal result={selectedResult} isOpen={showSwaggerModal} onClose={() => setShowSwaggerModal(false)} />
 
-      {/* 푸터 */}
-      <footer className="bg-gray-50 border-t border-gray-200 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-600">
-            <p>© 2024 OpenData API Search. 기술 키워드 기반 오픈 데이터 검색 플랫폼</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -9,60 +9,7 @@ import Navigation from "@/components/ui/Navigation"
 import ErrorBoundary from "@/components/ErrorBoundary"
 import type { SearchResult } from "@/types"
 
-// 더미 상세 데이터 (기존과 동일하지만 새로운 타입 적용)
-const mockDetailData: Record<
-  string,
-  SearchResult & {
-    fields: Array<{ name: string; type: string; description: string }>
-  }
-> = {
-  "1": {
-    id: "1",
-    title: "공공데이터포털 API 목록",
-    description:
-      "정부에서 제공하는 다양한 공공데이터 API 정보를 제공합니다. 이 데이터셋은 중앙부처 및 지방자치단체에서 개방한 다양한 분야의 공공데이터 API 목록과 상세 정보를 포함하고 있습니다.",
-    snippet:
-      "중앙부처 및 지방자치단체에서 보유하고 있는 다양한 데이터를 국민들이 활용할 수 있도록 개방하는 대한민국 공공데이터 통합 제공 시스템입니다.",
-    url: "https://www.data.go.kr",
-    source: "data.go.kr",
-    keywords: ["API", "공공데이터", "정부", "오픈데이터"],
-    category: "정부",
-    lastUpdated: "2024-01-15",
-    dataFormat: "JSON, XML",
-    rating: 4.5,
-    downloadCount: 15234,
-    license: "공공누리 제1유형",
-    apiEndpoint: "https://www.data.go.kr/api/15000581/openapi.do",
-    fields: [
-      { name: "API_ID", type: "String", description: "API 고유 식별자" },
-      { name: "API_NAME", type: "String", description: "API 명칭" },
-      { name: "PROVIDER", type: "String", description: "제공기관" },
-      { name: "CATEGORY", type: "String", description: "분야 구분" },
-      { name: "UPDATE_DATE", type: "Date", description: "최종 수정일" },
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "서울시 실시간 교통정보",
-    description: "서울시 내 실시간 교통 상황 및 도로 정보를 제공하는 데이터셋입니다.",
-    snippet: "서울시 교통정보센터 (TOPIS)에서 제공하는 실시간 교통 정보 데이터입니다.",
-    url: "http://topis.seoul.go.kr",
-    source: "topis.seoul.go.kr",
-    keywords: ["교통", "실시간", "서울시", "도로"],
-    category: "교통",
-    lastUpdated: "2024-01-14",
-    dataFormat: "JSON",
-    rating: 4.2,
-    downloadCount: 48567,
-    license: "CC BY",
-    apiEndpoint: "http://topis.seoul.go.kr/api/traffic",
-    fields: [
-      { name: "ROAD_NAME", type: "String", description: "도로명" },
-      { name: "TRAFFIC_SPEED", type: "Number", description: "평균 속도" },
-      { name: "CONGESTION_LEVEL", type: "String", description: "혼잡도" },
-    ],
-  },
-}
+
 
 const DetailPage: React.FC = () => {
   const params = useParams()
