@@ -60,7 +60,7 @@ public class StackOverflowService {
                 + "?order=desc"
                 + "&sort=activity"
                 + "&site=stackoverflow"
-                + "&pagesize=1000"
+                + "&pagesize=99"
                 + "&key=" + apiKey
                 + "&filter=withbody";
         Map<String, Object> result = restTemplate.getForObject(url, Map.class);

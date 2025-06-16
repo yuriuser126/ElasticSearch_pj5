@@ -33,7 +33,7 @@ export const useSearch = (initialQuery: string = "") => {
   const size = 10
 
 
-  const search = useCallback(async (searchQuery: string, searchParams: any = {}) => {
+  const search = useCallback(async (searchQuery: string, searchParams: any = {}, searchFilters?:SearchFilters) => {
     if (!searchQuery.trim()) {
       setResults([])
       setQuery("")

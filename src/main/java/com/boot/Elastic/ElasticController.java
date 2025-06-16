@@ -93,7 +93,7 @@ public class ElasticController {
          @RequestParam(name = "format", required = false) String format,
          @RequestParam(name = "sortBy", required = false) String sortBy
 
-    	) throws IOException {
+    	) throws Exception {
     	ElasticsearchClient client = elasticConfig.getClient();
 
     	int from = (page - 1) * size;
