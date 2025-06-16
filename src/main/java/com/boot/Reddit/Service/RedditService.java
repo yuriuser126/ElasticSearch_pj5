@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpEntity;
@@ -22,7 +23,8 @@ import org.springframework.web.client.RestTemplate;
 import com.boot.Elastic.ElasticService;
 import com.boot.Reddit.DTO.RedditItem;
 import com.boot.Reddit.Repository.RedditRepository;
-
+import com.boot.StackRedditQuestion.Model.StackRedditQuestion;
+import com.boot.StackRedditQuestion.Repository.StackRedditQuestionRepository;
 import com.boot.Mongodb.Model.Question;
 import com.boot.Mongodb.Repository.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,8 @@ public class RedditService {
 	 @Autowired
     private ElasticService elasticService;
 	 
-    @Autowired
-    private QuestionRepository questionRepository;
+   @Autowired
+    private StackRedditQuestionRepository StackRedditQuestionRepository;  // ✅ 통합 저장소
 
 	// 설정파일(application.properties)에서 Reddit API 인증정보 읽어옴
     @Value("${reddit.client.id}")
@@ -191,19 +193,28 @@ public class RedditService {
     /**
      * Reddit API에서 핫 게시글 가져와 Question 객체로 변환 후 MongoDB에 저장
      */
-    public void fetchAndSaveHotPostsAsQuestions(String subreddit, int limit) {
-        Map<String, Object> response = fetchHotPosts(subreddit, limit);
+    public void fetchAndSaveHotPostsAsQuestions(String keyword, int limit) {
+        Map<String, Object> response = fetchHotPosts(keyword, limit);
         if (response == null) return;
 
         Map<String, Object> data = (Map<String, Object>) response.get("data");
         List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
         if (children == null || children.isEmpty()) return;
 
-        List<Question> questions = children.stream().map(child -> {
+        List<StackRedditQuestion> questions = children.stream().map(child -> {
             Map<String, Object> postData = (Map<String, Object>) child.get("data");
-            Question q = new Question();
+            StackRedditQuestion q = new StackRedditQuestion();
             q.setTitle((String) postData.get("title"));
-            q.setBody((String) postData.get("selftext"));  // Reddit 본문 필드명
+            
+            // body 처리 및 길이 제한 적용
+            String body = Optional.ofNullable((String) postData.get("selftext"))
+                    .filter(s -> !s.trim().isEmpty())
+                    .orElse("“자세한 내용은 원문 사이트에서 확인하세요”");
+			if (body.length() > 1000) {
+			  body = body.substring(0, 1000) + "...";
+			}
+            q.setBody(body);// Reddit 본문 필드명
+            
             q.setAuthor((String) postData.get("author"));
             q.setLink("https://reddit.com" + postData.get("permalink"));
             q.setTags(null); // Reddit은 태그가 없으므로 null 처리하거나 다른 방법으로 설정 가능
@@ -211,7 +222,7 @@ public class RedditService {
             return q;
         }).collect(Collectors.toList());
 
-        questionRepository.saveAll(questions);
+        StackRedditQuestionRepository.saveAll(questions);
     }
 }
 

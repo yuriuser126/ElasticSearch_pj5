@@ -10,17 +10,21 @@ import SearchResultItem from "@/components/ui/SearchResultItem"
 import Navigation from "@/components/ui/Navigation"
 import ErrorBoundary from "@/components/ErrorBoundary"
 import { useSearch } from "@/hooks/useSearch"
-import type { SearchResult } from "@/types"
-import type { KnowledgePanelType } from "@/types"
 
-// 코드 스플리팅
+import type { SearchResult } from "@/types"
+import PaginationComponent from '@/components/PaginationComponent'
+
+
+
 const KnowledgePanel = lazy(() => import("@/components/ui/KnowledgePanel"))
 const SearchResultModal = lazy(() => import("@/components/ui/SearchResultModal"))
 const Sidebar = lazy(() => import("@/components/layout/Sidebar"))
 
-const MAX_PAGE = 3 // 페이지네이션 최대 페이지 수
 
 const SearchPage: React.FC = () => {
+  console.log("🛠️ SearchPage 렌더링")
+  const shouldShowPagination = true;
+  
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -31,83 +35,142 @@ const SearchPage: React.FC = () => {
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [currentPage, setCurrentPage] = useState<number>(isNaN(initialPage) ? 1 : initialPage)
+  const [appliedFilters, setAppliedFilters] = useState<any>({})
+  
+  // const { results, knowledgePanel, loading, error, totalResults, searchTime, search, shouldShowPagination } = useSearch(query);
+  const { results, knowledgePanel, loading, error, totalResults, searchTime, search } = useSearch(query);
 
-  const { results, knowledgePanel, loading, error, filters, totalResults, searchTime, search } = useSearch()
+  const resultsPerPage = 10 // 프론트에서도 동일하게 10으로 지정
+  const MAX_PAGE = totalResults && totalResults > 0 ? Math.ceil(totalResults / resultsPerPage) : 1
 
-  // 검색 실행 함수 (query, filters, page 조합)
-  const doSearch = useCallback(
-    (searchQuery: string, appliedFilters: any = {}, page: number = 1) => {
-      search(searchQuery, { ...appliedFilters, page })
+    // 페이지네이션 표시 조건
+  // const shouldShowPagination = !loading && !error && results.length > 0 && totalResults > resultsPerPage;
+
+  // 🔥 통합된 검색 실행 함수
+  const executeSearch = useCallback(
+    (searchQuery: string, page: number = 1, filters: any = {}) => {
+      if (!searchQuery.trim()) return;
+      
+      console.log("🚀 executeSearch 호출:", { searchQuery, page, filters })
+      
+      const searchParams = { 
+        page, 
+        size: resultsPerPage,
+        ...filters
+      }
+      
+      search(searchQuery, searchParams)
     },
-    [search]
+    [search, resultsPerPage]
   )
 
-  // URL의 쿼리 및 페이지 변경 시 검색 실행
+  // URL 파라미터 변경 감지
+  useEffect(() => {
+    const pageParam = searchParams.get("page")
+    const pageNum = pageParam ? parseInt(pageParam, 10) : 1
+    const validPageNum = isNaN(pageNum) ? 1 : Math.max(1, pageNum)
+    
+    if (validPageNum !== currentPage) {
+      console.log("📄 페이지 상태 동기화:", currentPage, "→", validPageNum)
+      setCurrentPage(validPageNum)
+    }
+  }, [searchParams])
+
+  // 🔥 쿼리나 페이지 변경 시 검색 실행 - 단순화
   useEffect(() => {
     if (query) {
-      doSearch(query, filters || {}, currentPage)
+      console.log("🔍 검색 트리거:", { query, currentPage })
+      executeSearch(query, currentPage, appliedFilters)
     }
-  }, [query, currentPage, filters, doSearch])
+  }, [query, currentPage, executeSearch]) // appliedFilters는 의존성에서 제외
 
-  // query 또는 page가 바뀌면 URL 동기화 (router.push)
-  // useEffect 의존성 주의: currentPage, query 변경 시 URL도 변경
+  // 디버그 로그
   useEffect(() => {
-    const url = `/search?q=${encodeURIComponent(query)}&page=${currentPage}`
-    router.replace(url) // replace로 기록 누적 방지
-  }, [query, currentPage, router])
+    console.log("📊 상태 업데이트:", {
+      결과개수: results.length,
+      전체결과: totalResults,
+      현재페이지: currentPage,
+      최대페이지: MAX_PAGE
+    })
+  }, [results.length, totalResults, currentPage, MAX_PAGE])
 
   useEffect(() => {
-  console.log("검색 결과:", results);
-  }, [results]);
+  console.log("SearchPage useEffect 호출됨 - currentPage:", currentPage)
+  }, [currentPage])
 
-  useEffect(() => {
-  console.log({ loading, error, results });
-  }, [loading, error, results]);
 
-  // 필터 변경 핸들러 - 기존 필터 병합 후 검색
-  const handleFiltersChange = (newFilters: any) => {
-    doSearch(query, { ...(filters || {}), ...newFilters }, 1)
-    setCurrentPage(1) // 필터 변경 시 페이지 초기화
-  }
+  // 필터 변경 핸들러
+  const handleFiltersChange = useCallback((newFilters: any) => {
+    console.log("🔧 필터 변경:", newFilters)
+    setAppliedFilters(newFilters)
+    setCurrentPage(1)
+    
+    const url = `/search?q=${encodeURIComponent(query)}&page=1`
+    router.replace(url)
+    
+    // 즉시 검색 실행
+    executeSearch(query, 1, newFilters)
+  }, [query, router, executeSearch])
 
-  const handleSearch = (newQuery: string) => {
+  const handleSearch = useCallback((newQuery: string) => {
     if (newQuery !== query) {
       setCurrentPage(1)
-      router.push(`/search?q=${encodeURIComponent(newQuery)}&page=1`)
+      setAppliedFilters({})
+      const url = `/search?q=${encodeURIComponent(newQuery)}&page=1`
+      router.push(url)
     }
-  }
+  }, [query, router])
 
-  const handleDetailClick = (result: SearchResult) => {
+  const handleDetailClick = useCallback((result: SearchResult) => {
     setSelectedResult(result)
     setShowModal(true)
-  }
+  }, [])
 
-  // 페이지 변경 핸들러 - 페이지 상태만 변경하면 useEffect에서 자동으로 검색 수행
-  const handlePageChange = (page: number) => {
+  // 🔥 페이지 변경 핸들러 - 간소화
+  const handlePageChange = useCallback((page: number) => {
+    console.log("📄 페이지 변경 요청:", page, "범위:", `1-${MAX_PAGE}`)
+    
     if (page >= 1 && page <= MAX_PAGE && page !== currentPage) {
-      setCurrentPage(page)
-      // URL 및 검색은 useEffect에서 동기화
+      console.log("✅ 페이지 변경 승인:", page)
+      
+      // URL 즉시 업데이트 (검색은 useEffect에서 처리)
+      const url = `/search?q=${encodeURIComponent(query)}&page=${page}`
+      router.replace(url)
+    } else {
+      console.log("❌ 페이지 변경 거부:", { 
+        page, 
+        valid: page >= 1 && page <= MAX_PAGE, 
+        different: page !== currentPage 
+      })
     }
-  }
+  }, [currentPage, MAX_PAGE, query, router])
 
-  console.log('test')
-  console.log('loading:', loading);
-  console.log('error:', error);
-  console.log('results.length:', results.length);
-  console.log('조건 전체:', !loading && !error && results.length > 0);
+  
 
+
+
+  console.log('🔍 페이지네이션 상태:', {
+    loading,
+    error: !!error,
+    resultsLength: results.length,
+    totalResults,
+    resultsPerPage,
+    // shouldShow: shouldShowPagination,
+    maxPage: MAX_PAGE
+  })
 
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-white">
-        {/* 네비게이션 */}
+        <div style={{ padding: 20, backgroundColor: "#e3f2fd" }}>
+          🚀 SearchPage - 페이지: {currentPage}/{MAX_PAGE}, 결과: {totalResults}개
+        </div>
+
         <Navigation />
 
-        {/* 헤더 */}
         <header className="border-b border-gray-200 bg-white sticky top-0 z-40">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <div className="flex items-center gap-8">
-              {/* 검색창 */}
               <div className="flex-1 max-w-2xl">
                 <GoogleStyleSearch onSearch={handleSearch} initialQuery={query} showSuggestions={false} />
               </div>
@@ -115,20 +178,16 @@ const SearchPage: React.FC = () => {
           </div>
         </header>
 
-        {/* 메인 콘텐츠 */}
         <main className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex gap-8">
-            {/* 검색 결과 영역 */}
             <div className="flex-1">
-              {/* 필터 및 결과 정보 */}
               <SearchFilters
-                filters={filters}
+                filters={appliedFilters}
                 onFiltersChange={handleFiltersChange}
                 totalResults={totalResults}
                 searchTime={searchTime}
               />
 
-              {/* 로딩 표시 */}
               {loading && (
                 <div className="space-y-8">
                   {[...Array(5)].map((_, index) => (
@@ -142,7 +201,6 @@ const SearchPage: React.FC = () => {
                 </div>
               )}
 
-              {/* 에러 표시 */}
               {error && (
                 <div className="text-center py-16" role="alert" aria-live="assertive">
                   <Database className="w-16 h-16 text-red-300 mx-auto mb-4" />
@@ -151,83 +209,49 @@ const SearchPage: React.FC = () => {
                 </div>
               )}
 
-              {/* 검색 결과 */}
               {!loading && !error && results.length > 0 && (
-                <>
-                  <div className="space-y-8">
-                    {results.map((result) => (
-                      <SearchResultItem
-                        key={result.id}
-                        result={result}
-                        query={query}
-                        onDetailClick={handleDetailClick}
-                      />
-                    ))}
-                  </div>
-
-                  
-
-
-                  {/* 페이지네이션 */}
-                  <div className="flex justify-center mt-12">
-                    <div className="flex items-center gap-2">
-                      {/* 이전 버튼 */}
-                      <button
-                        type="button"
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        aria-disabled={currentPage === 1}
-                        aria-label="이전 페이지"
-                        className={`px-3 py-2 rounded transition-colors ${
-                          currentPage === 1
-                            ? "text-gray-300 cursor-not-allowed"
-                            : "text-blue-600 hover:bg-blue-50"
-                        }`}
-                      >
-                        이전
-                      </button>
-
-                      {/* 페이지 번호 버튼 */}
-                      {[...Array(MAX_PAGE)].map((_, idx) => {
-                        const pageNum = idx + 1
-                        return (
-                          <button
-                            key={pageNum}
-                            type="button"
-                            onClick={() => handlePageChange(pageNum)}
-                            aria-current={currentPage === pageNum ? "page" : undefined}
-                            className={`px-3 py-2 rounded ${
-                              currentPage === pageNum
-                                ? "bg-blue-600 text-white"
-                                : "text-blue-600 hover:bg-blue-50"
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        )
-                      })}
-
-                      {/* 다음 버튼 */}
-                      <button
-                        type="button"
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === MAX_PAGE}
-                        aria-disabled={currentPage === MAX_PAGE}
-                        aria-label="다음 페이지"
-                        className={`px-3 py-2 rounded transition-colors ${
-                          currentPage === MAX_PAGE
-                            ? "text-gray-300 cursor-not-allowed"
-                            : "text-blue-600 hover:bg-blue-50"
-                        }`}
-                      >
-                        다음
-                      </button>
-                    </div>
-                  </div>
-                </>
+                <div className="space-y-8">
+                  {results.map((result) => (
+                    <SearchResultItem
+                      key={result.id}
+                      result={result}
+                      query={query}
+                      onDetailClick={handleDetailClick}
+                    />
+                  ))}
+                </div>
               )}
 
-              {/* 검색 결과 없음 */}
+              
+
+
+
+              {shouldShowPagination && (
+                <div className="mt-8">
+                  <div className="text-center mb-4 text-sm text-gray-600">
+                    페이지 {currentPage} / {MAX_PAGE} (총 {totalResults.toLocaleString()}개 결과)
+                  </div>
+                  
+                  <PaginationComponent
+                    currentPage={currentPage}
+                    maxPage={MAX_PAGE}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+               )}              
+
+              {!shouldShowPagination && query && (
+                <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded">
+                  <h4 className="font-bold text-blue-800">🔍 페이지네이션 상태:</h4>
+                  <ul className="text-sm text-blue-700 mt-2 space-y-1">
+                    <li>loading: {loading ? '🔄 로딩 중' : '✅ 완료'}</li>
+                    <li>error: {error ? `❌ ${error}` : '✅ 없음'}</li>
+                    <li>results: {results.length > 0 ? `✅ ${results.length}개` : '❌ 0개'}</li>
+                    <li>조건: {totalResults} {totalResults > resultsPerPage ? '>' : '<='} {resultsPerPage}</li>
+                  </ul>
+                </div>
+               )} 
+
               {!loading && !error && results.length === 0 && query && (
                 <div className="text-center py-16">
                   <Database className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -255,17 +279,14 @@ const SearchPage: React.FC = () => {
               )}
             </div>
 
-            {/* 사이드바 영역 */}
             <div className="hidden lg:block">
               <div className="space-y-6">
-                {/* 지식 패널 */}
                 {knowledgePanel && (
                   <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
                     <KnowledgePanel data={knowledgePanel} />
                   </Suspense>
                 )}
 
-                {/* 트렌드 사이드바 */}
                 <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
                   <Sidebar />
                 </Suspense>
@@ -274,7 +295,6 @@ const SearchPage: React.FC = () => {
           </div>
         </main>
 
-        {/* 검색 결과 모달 */}
         <Suspense fallback={null}>
           <SearchResultModal result={selectedResult} isOpen={showModal} onClose={() => setShowModal(false)} />
         </Suspense>

@@ -17,6 +17,8 @@ import com.boot.Mongodb.Model.Question;
 import com.boot.Mongodb.Repository.QuestionRepository;
 import com.boot.StackOverflow.DTO.StackOverflowQuestion;
 import com.boot.StackOverflow.Repository.StackOverflowQuestionRepository;
+import com.boot.StackRedditQuestion.Model.StackRedditQuestion;
+import com.boot.StackRedditQuestion.Repository.StackRedditQuestionRepository;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -32,10 +34,11 @@ public class StackOverflowService {
     private ElasticService elasticService;
     
     @Autowired
-    private QuestionRepository questionRepository;  // ✅ 통합 저장소
-
+    private StackRedditQuestionRepository StackRedditQuestionRepository;  // ✅ 통합 저장소
     @Autowired
-    private StackOverflowQuestionRepository repository;
+    private StackOverflowQuestionRepository repository;  
+
+   
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -117,12 +120,14 @@ public class StackOverflowService {
         }
     }
     
-    public void saveQuestionsToMongo() {
+    //limit(페이지 크기) 매개변수를 받아서 URL에 반영 통합 몽고디비 저장 StackRedditQuestion으로
+    public void saveQuestionsToMongo(String keyword,int limit) {
         String url = "https://api.stackexchange.com/2.3/questions"
                 + "?order=desc"
                 + "&sort=activity"
                 + "&site=stackoverflow"
-                + "&pagesize=10"
+                + "&pagesize=" + limit
+                + "&tagged=" + keyword  
                 + "&key=" + apiKey
                 + "&filter=withbody";
 
@@ -140,21 +145,21 @@ public class StackOverflowService {
         List<Map<String, Object>> items = (List<Map<String, Object>>) result.get("items");
 
         if (items != null && !items.isEmpty()) {
-            List<Question> questions = items.stream().map(item -> {
-                Question q = new Question();
+            List<StackRedditQuestion> questions = items.stream().map(item -> {
+                StackRedditQuestion q = new StackRedditQuestion();
                 q.setTitle((String) item.get("title"));
                 q.setBody((String) item.get("body"));
                 Map<String, Object> owner = (Map<String, Object>) item.get("owner");
                 q.setAuthor(owner != null ? (String) owner.get("display_name") : "StackOverflow");
                 q.setLink((String) item.get("link"));
                 q.setTags((List<String>) item.get("tags"));
-                q.setSource("StackOverflow");
                 return q;
             }).collect(Collectors.toList());
 
-            questionRepository.saveAll(questions);
+            StackRedditQuestionRepository.saveAll(questions);
         }
     }
+
     
 
 }
