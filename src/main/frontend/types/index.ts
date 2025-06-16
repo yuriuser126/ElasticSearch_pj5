@@ -5,7 +5,7 @@ export interface SearchResult {
   body: string
   url: string
   link?: string;
-  _id: string
+  source: string
   tags: string[]    
   keywords: string[]
   category: string
