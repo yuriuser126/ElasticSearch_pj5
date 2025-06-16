@@ -88,7 +88,6 @@ const HomePage: React.FC = () => {
     const loading = useAuthStore((state) => state.loading);
     const logoutUser = useAuthStore((state) => state.logoutUser);
     const router = useRouter();
-     const pathname = usePathname();
 
     const [searchValue, setSearchValue] = useState("");
     // const [currentView, setCurrentView] = useState<"default" | "history">("default")
@@ -98,9 +97,6 @@ const HomePage: React.FC = () => {
       router.push('/user/login');
     };
   }
-
-
-  
   return (
 
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -140,19 +136,13 @@ const HomePage: React.FC = () => {
               </div>
               
                
-                {/* <Button
-                    variant={currentView === "history" ? "default" : "ghost"}
-                    onClick={() => setCurrentView("history")}
-                    className="flex items-center gap-2"
-                  >
-                    <History className="h-4 w-4" />
-                    수집 이력
-                  </Button> */}
+			  <Button asChild variant="ghost" className="w-full justify-start">
+			  <Link href="/history"> 
+			  <History className="mr-2 h-4 w-4" /> 수집 이력 
+			  </Link> 
+			  </Button>
 
-                  <Button asChild variant="ghost" className="w-full justify-start"> 
-                    <Link href="/history">
-                     <History className="mr-2 h-4 w-4" /> 수집 이력 </Link> 
-                     </Button>
+
 
                   
               

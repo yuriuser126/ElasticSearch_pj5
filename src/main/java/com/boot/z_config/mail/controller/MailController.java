@@ -51,22 +51,4 @@ public class MailController {
 	    response.put("code", code);
 	    return ResponseEntity.ok(response);
 	}
-	
-	
-	 // 비밀번호 확인용 이메일 코드 발송
-    @RequestMapping("/pwdMailConfirm") // 또는 /mailOnlyConfirm 등으로 경로 구분 가능
-    @ResponseBody
-    public ResponseEntity<?> pwdMailConfirm(@RequestParam("email") String email) throws Exception {
-        System.out.println("비밀번호 재설정 이메일 인증 요청: " + email);
-
-        // 인증 코드 생성 및 이메일 발송
-        String code = mailService.sendSimpleMessage(email);
-        System.out.println("인증코드: " + code);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("code", code);
-        return ResponseEntity.ok(response);
-    }
-	
 }

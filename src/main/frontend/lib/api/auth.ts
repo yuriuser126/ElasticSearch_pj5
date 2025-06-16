@@ -73,36 +73,3 @@ export const sendVerificationEmail = async (email: string): Promise<MailConfirmR
   });
   return response.data;
 };
-
-//비밀번호 찾기용 이메일체크
-export const pwdCheckEmail = async (email: string): Promise<MailConfirmResponse> => {
-  const response = await api.get<MailConfirmResponse>('/pwdMailConfirm', {
-    params: {
-    
-      email: email,
-    },
-  });
-  return response.data;
-};
-
-//비밀번호 변경
-export const changePassword = async (
-  userId: string,
-  userPw: string
-): Promise<{ success: boolean; message: string }> => {
-  const response = await api.post("/changePassword", {
-    userId,
-    userPw,
-  });
-  return response.data;
-};
-
-//비밀번호 찾기 유저 확인
-export const checkUserIdExists = async (
-  userId: string
-): Promise<{ success: boolean; message?: string }> => {
-  const response = await api.post("/checkId", {
-    userId,
-  });
-  return response.data;
-};

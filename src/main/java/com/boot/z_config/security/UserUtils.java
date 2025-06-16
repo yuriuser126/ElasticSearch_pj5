@@ -1,20 +1,22 @@
 package com.boot.z_config.security;
 
 import java.util.HashMap;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.boot.user.dto.UserDTO;
 import com.boot.user.service.UserService;
 import com.boot.z_config.security.jwt.JwtTokenUtil;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 사용자 정보 관련 유틸리티 클래스
@@ -29,6 +31,30 @@ public class UserUtils {
     
     @Autowired
     private UserService userService;
+    
+    /**
+     * Spring Security 컨텍스트에서 현재 인증된 사용자의 ID(일반적으로 username)를 가져옵니다.
+     * 이 메소드는 static이므로 어디서든 직접 호출할 수 있습니다.
+     * @return 인증된 사용자의 ID를 포함하는 Optional 객체. 사용자가 인증되지 않은 경우 empty.
+     */
+    public static Optional<String> getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return Optional.empty();
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof UserDetails) {
+            // UserDetails의 username을 반환합니다. PrincipalDetails가 UserDetails를 구현하므로 여기에 해당합니다.
+            // PrincipalDetails에서 getUsername()이 user_email을 반환하도록 설정되어 있으므로, 사용자의 이메일이 ID가 됩니다.
+            return Optional.of(((UserDetails) principal).getUsername());
+        } else {
+            // UserDetails가 아닌 다른 타입의 Principal(예: 소셜 로그인 후 처리 전)인 경우, toString()을 사용합니다.
+            return Optional.of(principal.toString());
+        }
+    }
     
     /**
      * HttpServletRequest에서 사용자 정보를 추출

@@ -38,8 +38,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	//	annotation api, elasticsearch, MongoDB
-	implementation 'co.elastic.clients:elasticsearch-java:9.0.0'
-
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	
