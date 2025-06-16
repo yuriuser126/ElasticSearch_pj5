@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -13,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Search, FileText, Clock, Database, Mail, Loader2, ArrowRight } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import Header from "@/components/Header"
 // import { Loader2, ArrowRight, Sparkles, Heart, Music, BookOpen } from "lucide-react"
 
 
@@ -27,12 +29,19 @@ export default function UserLoginPage() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
   const authLoading = useAuthStore((state) => state.loading)
   const loginSuccess = useAuthStore((state) => state.loginSuccess)
+  const logoutUser = useAuthStore((state) => state.logoutUser)
 
   useEffect(() => {
     if (!authLoading && isLoggedIn) {
       router.replace("/") // 로그인 상태라면 홈으로 리다이렉트
     }
   }, [isLoggedIn, authLoading, router])
+  
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push('/user/login');
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -57,6 +66,7 @@ export default function UserLoginPage() {
     }
   }
 
+
   // if (authLoading) {
   //   return (
   //     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 flex justify-center items-center">
@@ -74,38 +84,16 @@ export default function UserLoginPage() {
     return null
   }
 
+
+
+// export default function Component() {
   return (
+
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Database className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
-                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
-              </div>
-            </div>
-            <nav className="flex items-center space-x-6">
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <Search className="w-4 h-4" />
-                <span>검색</span>
-              </Link>
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <FileText className="w-4 h-4" />
-                <span>API 문서</span>
-              </Link>
-              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
-                <Clock className="w-4 h-4" />
-                <span>수집 이력</span>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
+    <Header />
+
+
+
 
       {/* Main Content */}
       <main className="max-w-md mx-auto pt-16 pb-12 px-4">
@@ -167,7 +155,7 @@ export default function UserLoginPage() {
                     로그인 상태 유지
                   </label>
                 </div>
-                <Link href="#" className="text-sm text-blue-600 hover:text-blue-500">
+                <Link href="/user/find-password/" className="text-sm text-blue-600 hover:text-blue-500">
                   비밀번호 찾기
                 </Link>
               </div>
@@ -190,7 +178,7 @@ export default function UserLoginPage() {
                 )}
               </Button>
 
-
+  
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -260,6 +248,7 @@ export default function UserLoginPage() {
         </div>
       </footer>
     </div>
-  )
+
+  );
 }
 
