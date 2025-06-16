@@ -73,6 +73,3 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-application {
-    mainClass = 'com.boot.BootElasticSearchpj5Application'
-}
