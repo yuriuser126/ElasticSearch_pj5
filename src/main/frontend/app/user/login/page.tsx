@@ -9,9 +9,13 @@ import useAuthStore from "@/store/authStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import { Search, FileText, Clock, Database, Mail, Loader2, ArrowRight } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, ArrowRight, Sparkles, Heart, Music, BookOpen } from "lucide-react"
+// import { Loader2, ArrowRight, Sparkles, Heart, Music, BookOpen } from "lucide-react"
+
+
 
 export default function UserLoginPage() {
   const [userId, setUserId] = useState("")
@@ -71,62 +75,50 @@ export default function UserLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
-    {/* <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">  */}
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
-      </div>
-
-      <div className="container max-w-md mx-auto py-8 px-4 relative z-10">
-        {/* Hero Section */}
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Database className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
+                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
+              </div>
             </div>
-            {/* <div className="relative bg-gradient-to-br from-violet-500 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
-              <Train className="w-10 h-10 text-white" />
-            </div> */}
-          </div>
-
-          <div className="space-y-2 mb-6">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              MoodSync
-            </h1>
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-              <Heart className="w-4 h-4 text-pink-500" />
-              <Music className="w-4 h-4 text-blue-500" />
-              <BookOpen className="w-4 h-4 text-green-500" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-gray-800">환영합니다!</h2>
-            <p className="text-gray-600 leading-relaxed">
-              감정 기반 맞춤 추천 서비스로
-              <br />
-              당신만의 특별한 경험을 시작하세요
-            </p>
+            <nav className="flex items-center space-x-6">
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <Search className="w-4 h-4" />
+                <span>검색</span>
+              </Link>
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <FileText className="w-4 h-4" />
+                <span>API 문서</span>
+              </Link>
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <Clock className="w-4 h-4" />
+                <span>수집 이력</span>
+              </Link>
+            </nav>
           </div>
         </div>
+      </header>
 
-        {/* Login Form Card */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm animate-slide-up">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl font-semibold text-gray-800 flex items-center justify-center gap-2">
-              <Sparkles className="w-5 h-5 text-violet-500" />
-              로그인
-            </CardTitle>
-            <CardDescription className="text-gray-600">계정 정보를 입력해주세요</CardDescription>
-          </CardHeader>
+      {/* Main Content */}
+      <main className="max-w-md mx-auto pt-16 pb-12 px-4">
+        {/* Login Form */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">로그인</h2>
+        </div>
 
-          <CardContent className="space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <Card className="shadow-lg border-0">
+          <CardContent className="p-8">
+           <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="userId" className="text-sm font-semibold text-gray-700">
+                <Label htmlFor="userId" className="text-sm font-medium text-gray-700">
                   아이디
                 </Label>
                 <Input
@@ -142,7 +134,7 @@ export default function UserLoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="userPw" className="text-sm font-semibold text-gray-700">
+                <Label htmlFor="userPw" className="text-sm font-medium text-gray-700">
                   비밀번호
                 </Label>
                 <Input
@@ -157,15 +149,32 @@ export default function UserLoginPage() {
                 />
               </div>
 
-              {error && (
+                 {error && (
                 <Alert className="border-red-200 bg-red-50/80 animate-shake">
                   <AlertDescription className="text-red-600 font-medium">{error}</AlertDescription>
                 </Alert>
               )}
 
-              <Button
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
+                    로그인 상태 유지
+                  </label>
+                </div>
+                <Link href="#" className="text-sm text-blue-600 hover:text-blue-500">
+                  비밀번호 찾기
+                </Link>
+              </div>
+
+               <Button
                 type="submit"
-                className="w-full h-12 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+               className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
                 disabled={loading}
               >
                 {loading ? (
@@ -180,96 +189,77 @@ export default function UserLoginPage() {
                   </div>
                 )}
               </Button>
+
+
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">또는</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 border-gray-300 hover:bg-gray-50 flex items-center justify-center space-x-2"
+                  onClick={() => window.location.href = "http://localhost:8485/oauth2/authorization/google"}
+                  >
+
+                  <Mail className="w-5 h-5 text-red-500" />
+                  <span>Google로 로그인</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 border-gray-300 hover:bg-gray-50 flex items-center justify-center space-x-2"
+                  onClick={() => window.location.href = "http://localhost:8485/oauth2/authorization/naver"}
+                >
+                  <div className="w-5 h-5 bg-green-500 rounded-sm flex items-center justify-center">
+                    <span className="text-white text-xs font-bold">N</span>
+                  </div>
+                  <span>네이버로 로그인</span>
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 border-gray-300 hover:bg-gray-50 flex items-center justify-center space-x-2"
+                   onClick={() => window.location.href = "http://localhost:8485/oauth2/authorization/kakao"}
+                >
+                  <div className="w-5 h-5 bg-yellow-400 rounded-sm flex items-center justify-center">
+                    <span className="text-black text-xs font-bold">K</span>
+                  </div>
+                  <span>카카오로 로그인</span>
+                </Button>
+              </div>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600">
+                  계정이 없으신가요?{" "}
+                  <Link href="/user/join" className="text-blue-600 hover:text-blue-500 font-medium">
+                    회원가입
+                  </Link>
+                </p>
+              </div>
             </form>
           </CardContent>
         </Card>
+      </main>
 
-        {/* Sign Up Link */}
-        <Card className="mt-6 shadow-lg border-0 bg-white/60 backdrop-blur-sm animate-slide-up delay-200">
-          <CardContent className="text-center p-6">
-            <p className="text-gray-600 mb-4 font-medium">MoodSync 회원이 아니신가요?</p>
-            <Link
-              href="/user/join"
-              className="inline-flex items-center gap-2 text-violet-600 font-semibold hover:text-violet-700 transition-all duration-200 hover:gap-3 group"
-            >
-              회원가입하기
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-200" />
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Feature Highlights */}
-        <div className="mt-8 grid grid-cols-3 gap-4 animate-fade-in delay-300">
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
-            <Heart className="w-6 h-6 text-pink-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">감정 분석</p>
-          </div>
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
-            <Music className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">음악 추천</p>
-          </div>
-          <div className="text-center p-4 bg-white/40 backdrop-blur-sm rounded-xl">
-            <BookOpen className="w-6 h-6 text-green-500 mx-auto mb-2" />
-            <p className="text-xs text-gray-600 font-medium">도서 추천</p>
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-sm text-gray-600">
+            © 2024 OpenData API Search. 기술 키워드 기반 오픈 데이터 검색 플랫폼
           </div>
         </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes shake {
-          0%, 100% {
-            transform: translateX(0);
-          }
-          25% {
-            transform: translateX(-5px);
-          }
-          75% {
-            transform: translateX(5px);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.6s ease-out;
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.6s ease-out;
-        }
-
-        .animate-shake {
-          animation: shake 0.5s ease-in-out;
-        }
-
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-          animation-delay: 0.3s;
-        }
-      `}</style>
+      </footer>
     </div>
   )
 }
+

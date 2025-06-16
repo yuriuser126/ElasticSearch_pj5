@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState, Suspense, lazy } from "react"
+import { useEffect, useState, Suspense, lazy, useCallback } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Database } from "lucide-react"
 import GoogleStyleSearch from "@/components/ui/GoogleStyleSearch"
@@ -18,43 +18,84 @@ const KnowledgePanel = lazy(() => import("@/components/ui/KnowledgePanel"))
 const SearchResultModal = lazy(() => import("@/components/ui/SearchResultModal"))
 const Sidebar = lazy(() => import("@/components/layout/Sidebar"))
 
+const MAX_PAGE = 3 // 페이지네이션 최대 페이지 수
+
 const SearchPage: React.FC = () => {
   const searchParams = useSearchParams()
   const router = useRouter()
+
   const query = searchParams.get("q") || ""
+  const pageParam = searchParams.get("page")
+  const initialPage = pageParam ? parseInt(pageParam, 10) : 1
+
   const [selectedResult, setSelectedResult] = useState<SearchResult | null>(null)
   const [showModal, setShowModal] = useState(false)
-  
-
+  const [currentPage, setCurrentPage] = useState<number>(isNaN(initialPage) ? 1 : initialPage)
 
   const { results, knowledgePanel, loading, error, filters, totalResults, searchTime, search } = useSearch()
 
+  // 검색 실행 함수 (query, filters, page 조합)
+  const doSearch = useCallback(
+    (searchQuery: string, appliedFilters: any = {}, page: number = 1) => {
+      search(searchQuery, { ...appliedFilters, page })
+    },
+    [search]
+  )
+
+  // URL의 쿼리 및 페이지 변경 시 검색 실행
   useEffect(() => {
     if (query) {
-      search(query)
+      doSearch(query, filters || {}, currentPage)
     }
-  }, [query, search])
+  }, [query, currentPage, filters, doSearch])
+
+  // query 또는 page가 바뀌면 URL 동기화 (router.push)
+  // useEffect 의존성 주의: currentPage, query 변경 시 URL도 변경
+  useEffect(() => {
+    const url = `/search?q=${encodeURIComponent(query)}&page=${currentPage}`
+    router.replace(url) // replace로 기록 누적 방지
+  }, [query, currentPage, router])
 
   useEffect(() => {
-  if (knowledgePanel) {
-    console.log("📌 지식 패널 데이터:", knowledgePanel)
+  console.log("검색 결과:", results);
+  }, [results]);
+
+  useEffect(() => {
+  console.log({ loading, error, results });
+  }, [loading, error, results]);
+
+  // 필터 변경 핸들러 - 기존 필터 병합 후 검색
+  const handleFiltersChange = (newFilters: any) => {
+    doSearch(query, { ...(filters || {}), ...newFilters }, 1)
+    setCurrentPage(1) // 필터 변경 시 페이지 초기화
   }
-}, [knowledgePanel])
 
   const handleSearch = (newQuery: string) => {
     if (newQuery !== query) {
-      router.push(`/search?q=${encodeURIComponent(newQuery)}`)
+      setCurrentPage(1)
+      router.push(`/search?q=${encodeURIComponent(newQuery)}&page=1`)
     }
-  }
-
-  const handleFiltersChange = (newFilters: any) => {
-    search(query, newFilters)
   }
 
   const handleDetailClick = (result: SearchResult) => {
     setSelectedResult(result)
     setShowModal(true)
   }
+
+  // 페이지 변경 핸들러 - 페이지 상태만 변경하면 useEffect에서 자동으로 검색 수행
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= MAX_PAGE && page !== currentPage) {
+      setCurrentPage(page)
+      // URL 및 검색은 useEffect에서 동기화
+    }
+  }
+
+  console.log('test')
+  console.log('loading:', loading);
+  console.log('error:', error);
+  console.log('results.length:', results.length);
+  console.log('조건 전체:', !loading && !error && results.length > 0);
+
 
   return (
     <ErrorBoundary>
@@ -103,7 +144,7 @@ const SearchPage: React.FC = () => {
 
               {/* 에러 표시 */}
               {error && (
-                <div className="text-center py-16">
+                <div className="text-center py-16" role="alert" aria-live="assertive">
                   <Database className="w-16 h-16 text-red-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">검색 중 오류가 발생했습니다</h3>
                   <p className="text-gray-500">{error}</p>
@@ -112,26 +153,78 @@ const SearchPage: React.FC = () => {
 
               {/* 검색 결과 */}
               {!loading && !error && results.length > 0 && (
-                <div className="space-y-8">
-                  {results.map((result) => (
-                    <SearchResultItem key={result.id} result={result} query={query} onDetailClick={handleDetailClick} />
-                  ))}
+                <>
+                  <div className="space-y-8">
+                    {results.map((result) => (
+                      <SearchResultItem
+                        key={result.id}
+                        result={result}
+                        query={query}
+                        onDetailClick={handleDetailClick}
+                      />
+                    ))}
+                  </div>
+
+                  
+
 
                   {/* 페이지네이션 */}
                   <div className="flex justify-center mt-12">
                     <div className="flex items-center gap-2">
-                      <button className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                      {/* 이전 버튼 */}
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        aria-disabled={currentPage === 1}
+                        aria-label="이전 페이지"
+                        className={`px-3 py-2 rounded transition-colors ${
+                          currentPage === 1
+                            ? "text-gray-300 cursor-not-allowed"
+                            : "text-blue-600 hover:bg-blue-50"
+                        }`}
+                      >
                         이전
                       </button>
-                      <button className="px-3 py-2 bg-blue-600 text-white rounded">1</button>
-                      <button className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">2</button>
-                      <button className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">3</button>
-                      <button className="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+
+                      {/* 페이지 번호 버튼 */}
+                      {[...Array(MAX_PAGE)].map((_, idx) => {
+                        const pageNum = idx + 1
+                        return (
+                          <button
+                            key={pageNum}
+                            type="button"
+                            onClick={() => handlePageChange(pageNum)}
+                            aria-current={currentPage === pageNum ? "page" : undefined}
+                            className={`px-3 py-2 rounded ${
+                              currentPage === pageNum
+                                ? "bg-blue-600 text-white"
+                                : "text-blue-600 hover:bg-blue-50"
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        )
+                      })}
+
+                      {/* 다음 버튼 */}
+                      <button
+                        type="button"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === MAX_PAGE}
+                        aria-disabled={currentPage === MAX_PAGE}
+                        aria-label="다음 페이지"
+                        className={`px-3 py-2 rounded transition-colors ${
+                          currentPage === MAX_PAGE
+                            ? "text-gray-300 cursor-not-allowed"
+                            : "text-blue-600 hover:bg-blue-50"
+                        }`}
+                      >
                         다음
                       </button>
                     </div>
                   </div>
-                </div>
+                </>
               )}
 
               {/* 검색 결과 없음 */}
@@ -149,6 +242,7 @@ const SearchPage: React.FC = () => {
                       {["공공데이터", "API", "교통정보", "날씨", "통계"].map((suggestion) => (
                         <button
                           key={suggestion}
+                          type="button"
                           onClick={() => handleSearch(suggestion)}
                           className="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
                         >
@@ -166,11 +260,10 @@ const SearchPage: React.FC = () => {
               <div className="space-y-6">
                 {/* 지식 패널 */}
                 {knowledgePanel && (
-                <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
-                  <KnowledgePanel data={knowledgePanel} />
-                </Suspense>
-                  )}
-
+                  <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>
+                    <KnowledgePanel data={knowledgePanel} />
+                  </Suspense>
+                )}
 
                 {/* 트렌드 사이드바 */}
                 <Suspense fallback={<div className="w-80 h-96 bg-gray-200 rounded-lg animate-pulse"></div>}>

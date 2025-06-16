@@ -1,4 +1,3 @@
-
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -8,22 +7,34 @@
 <select id="checkEmail" parameterType="String" resultType="Integer">
     SELECT COUNT(*) FROM user_info WHERE userEmail = #{userEmail}
 </select>
-	<!-- 회원가입 -->
+<!--	 회원가입 -->
+<!--	<insert id="userJoin">-->
+<!--		INSERT INTO user_info (-->
+<!--		userNumber, userId, userPw,-->
+<!--		userName, userTel,-->
+<!--		userEmail, userBirth, userZipCode, userAddress,-->
+<!--		userDetailAddress-->
+<!--		)-->
+<!--		VALUES (-->
+<!--		(SELECT NVL(MAX(userNumber), 0) + 1 FROM-->
+<!--		user_info),-->
+<!--		#{userId}, #{userPw}, #{userName}, #{userTel},-->
+<!--		#{userEmail},-->
+<!--		#{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}-->
+<!--		)-->
+
+<!--	</insert>-->
+
 	<insert id="userJoin">
-		INSERT INTO user_info (
-		userNumber, userId, userPw,
-		userName, userTel,
-		userEmail, userBirth, userZipCode, userAddress,
-		userDetailAddress
-		)
-		VALUES (
-		(SELECT NVL(MAX(userNumber), 0) + 1 FROM
-		user_info),
-		#{userId}, #{userPw}, #{userName}, #{userTel},
-		#{userEmail},
-		#{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}
-		)
-	</insert>
+    INSERT INTO user_info (
+        userId, userPw, userName, userTel,
+        userEmail, userBirth, userZipCode, userAddress,
+        userDetailAddress, developerType
+    ) VALUES (
+        #{userId}, #{userPw}, #{userName}, #{userTel},
+        #{userEmail}, #{userBirth}, #{userZipCode}, #{userAddress}, #{userDetailAddress}, #{developerType}
+    )
+</insert>
 
 	<!-- 로그인 -->
 	<select id="userLogin"

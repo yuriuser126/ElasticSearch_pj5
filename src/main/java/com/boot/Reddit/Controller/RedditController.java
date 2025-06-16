@@ -32,4 +32,18 @@ public class RedditController {
     public List<RedditItem> getAllItems() {
         return redditService.getAllItems();
     }
+    
+    //엘라스틱쪽 저장 10 개 가지고와서 저장
+    //subreddit은 Reddit에서 특정 주제별로 나눠진 커뮤니티
+    // fetch/elastic?subreddit = java or memes or machinelearning
+    @PostMapping("/fetch/elastic")
+    public String fetchAndSaveTenToElastic(@RequestParam("subreddit") String subreddit) {
+        try {
+            redditService.saveTenHotPostToElastic(subreddit);
+            return "Elasticsearch에 Reddit 게시글 10개 저장 완료";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "오류 발생: " + e.getMessage();
+        }
+    }
 }

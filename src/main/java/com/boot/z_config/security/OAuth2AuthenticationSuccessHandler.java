@@ -27,18 +27,24 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
             throws IOException, ServletException {
         // 토큰생성
         String token = jwtTokenUtil.generateToken(authentication);
+        System.out.println("✅ JWT 생성 완료: " + token);
 
         Cookie jwtCookie = new Cookie("jwt_token", token);
         jwtCookie.setPath("/");
         jwtCookie.setHttpOnly(true);
         jwtCookie.setMaxAge(1 * 24 * 60 * 60);
 
+
         if (request.isSecure()) {
             jwtCookie.setSecure(true);
         }
 
         response.addCookie(jwtCookie);
-        response.sendRedirect("/");
+//        response.sendRedirect("/");
+        response.sendRedirect("http://localhost:3000");
+
+
     }
 
-}
+
+    }

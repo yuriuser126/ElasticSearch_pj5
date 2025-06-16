@@ -42,6 +42,7 @@ export interface SwaggerDoc {
 export interface SearchFilters {
   category?: string
   format?: string
+  page?: number 
   sortBy?: "relevance" | "date" | "popularity"
 }
 
@@ -65,4 +66,11 @@ export interface HackerNewsItem {
   score?: number;
   descendants?: number;
   type?: string;
+}
+
+export interface TrendKeyword {
+  keyword: string
+  count: number
+  trend: "up" | "down" | "stable"
+  percentage: number
 }

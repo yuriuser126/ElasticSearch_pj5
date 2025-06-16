@@ -11,40 +11,31 @@ import com.boot.z_config.security.CustomAuthenticationFailureHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Swagger 및 정적 리소스 허용 경로
-    private static final String[] SWAGGER_PERMIT_ALL_URLS = {
-            "/swagger-ui.html",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/webjars/**"
-    };
-
-    private static final String[] STATIC_HTML_PERMIT_ALL_URLS = {
-            "/*.html",
-            "/css/**",
-            "/js/**",
-            "/favicon.ico"
-    };
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -72,31 +63,43 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
+
+    // Swagger 및 정적 리소스 허용 경로
+    private static final String[] SWAGGER_PERMIT_ALL_URLS = {
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
+
+    private static final String[] STATIC_HTML_PERMIT_ALL_URLS = {
+            "/*.html",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        System.out.println("✅ SecurityConfig 적용됨 - 병합 설정");
 
-        http
-                .cors(Customizer.withDefaults())
+    	System.out.println("✅ SecurityConfig 적용됨 - Swagger 및 static HTML 경로 허용 시도");
+    	http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .authorizeHttpRequests(auth -> auth
-                        // API 및 인증 없는 경로
-                        .requestMatchers(
-                                HttpMethod.POST, "/api/stackoverflow/fetch/elastic/one"
-                        ).permitAll()
-                        .requestMatchers(
-                                HttpMethod.GET, "/api/stackoverflow/**"
-                        ).permitAll()
+                		.requestMatchers(SWAGGER_PERMIT_ALL_URLS).permitAll() // Swagger 관련 경로
+                        .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll() // static HTML 및 리소스 경로
                         .requestMatchers(
                                 "/user/login", "/user/register", "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**",
                                 "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
-                                "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping", "/es/**",
-                                "/hackernews/**", "/api/stackoverflow/**", "/questions", "/api/trends", "/api/favorite", "/user/**"
+                                "/favicon.ico", "/reddit/**", "/api/convert/**",
+                                "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends",
+                                "/api/stackoverflow/fetch/elastic/one","/api/favorite", "/user/**"
+
                         ).permitAll()
-                        .requestMatchers(SWAGGER_PERMIT_ALL_URLS).permitAll()
-                        .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll()
                         .requestMatchers("/user/me").authenticated()
                         .anyRequest().authenticated()
                 )
@@ -122,9 +125,13 @@ public class SecurityConfig {
                 )
                 .userDetailsService(userDetailsService)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(Customizer.withDefaults());
+    	 		.httpBasic(Customizer.withDefaults()); // 기본 인증 방식 (Postman/curl 용)
 
         return http.build();
+
+
+
+
     }
 
     @Bean

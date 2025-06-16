@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Script from "next/script"
@@ -14,7 +13,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  Loader2,
+  Search,
+  FileText,
+  Clock,
+  Database,
   Mail,
   Shield,
   User,
@@ -28,10 +30,6 @@ import {
   Phone,
   Eye,
   EyeOff,
-  Sparkles,
-  Heart,
-  Music,
-  BookOpen,
 } from "lucide-react"
 
 interface FormData {
@@ -45,6 +43,7 @@ interface FormData {
   userZipCode: string
   userAddress: string
   userDetailAddress: string
+  developerType: string
 }
 
 export default function UserJoinPage() {
@@ -60,6 +59,7 @@ export default function UserJoinPage() {
     userZipCode: "",
     userAddress: "",
     userDetailAddress: "",
+    developerType: "",
   })
 
   // 약관 동의 상태
@@ -70,7 +70,7 @@ export default function UserJoinPage() {
     allAgree: false,
   })
 
-  // 이메일 인증 상태
+   // 이메일 인증 상태
   const [emailVerified, setEmailVerified] = useState(false)
   const [verificationCode, setVerificationCode] = useState("")
   const [serverCode, setServerCode] = useState("")
@@ -117,6 +117,7 @@ export default function UserJoinPage() {
       setAgreements(newAgreements)
     }
   }
+
 
   // 입력 핸들러
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,6 +167,7 @@ export default function UserJoinPage() {
     setEmailError("")
     setEmailSuccess("인증번호 발송 중...")
     setEmailLoading(true)
+
 
     try {
       const response = await sendVerificationEmail(form.userEmail)
@@ -223,7 +225,20 @@ export default function UserJoinPage() {
 
   // 주소 검색
   const handleOpenPostcode = () => {
-    if (typeof window !== "undefined" && window.daum && window.daum.Postcode) {
+
+    /*   로그인 후 리디렉션 등으로 인해 window.daum이 사라진 경우에도,
+    주소 검색 버튼을 누르면 다시 스크립트를 로드하고 팝업을 띄움
+    팝업이 무조건 정상 동작함 */
+    const loadPostcodeScript = () => {
+    const script = document.createElement("script")
+    script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+    script.async = true
+    script.onload = () => openPostcodePopup() // 스크립트 로드되면 팝업 띄움
+    document.body.appendChild(script)
+  }
+
+  const openPostcodePopup = () => {
+    // if (typeof window !== "undefined" && window.daum && window.daum.Postcode) {
       new window.daum.Postcode({
         oncomplete: (data: any) => {
           let fullAddress = data.address
@@ -247,6 +262,14 @@ export default function UserJoinPage() {
         },
       }).open()
     }
+
+    // 스크립트가 없으면 로드 → 있으면 바로 팝업
+    if (typeof window !== "undefined" && (!window.daum || !window.daum.Postcode)) {
+      loadPostcodeScript()
+    } else {
+      openPostcodePopup()
+    }
+
   }
 
   // 다음 단계로
@@ -318,6 +341,7 @@ export default function UserJoinPage() {
           form.userBirth &&
           form.userZipCode &&
           form.userAddress &&
+          form.developerType &&
           !passwordMatchError
         )
       default:
@@ -325,42 +349,54 @@ export default function UserJoinPage() {
     }
   }
 
+useEffect(() => {
+  if (!window.daum || !window.daum.Postcode) {
+    const script = document.createElement("script");
+    script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-pink-400/20 to-rose-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
-
-      <div className="container max-w-2xl mx-auto py-8 px-4 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8 animate-slide-up">
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Database className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">OpenData API Search</h1>
+                <p className="text-sm text-gray-600">기술 키워드 기반 오픈 데이터 API 검색 플랫폼</p>
+              </div>
             </div>
-            {/* <div className="relative bg-gradient-to-br from-purple-500 to-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto shadow-2xl transform hover:scale-105 transition-transform duration-300">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div> */}
-          </div>
-
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 bg-clip-text text-transparent mb-2">
-            MoodSync 회원가입
-          </h1>
-          <p className="text-gray-600">감정 기반 맞춤 추천 서비스에 가입하세요</p>
-
-          <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-            <Heart className="w-4 h-4 text-pink-500" />
-            <Music className="w-4 h-4 text-blue-500" />
-            <BookOpen className="w-4 h-4 text-green-500" />
+            <nav className="flex items-center space-x-6">
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <Search className="w-4 h-4" />
+                <span>검색</span>
+              </Link>
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <FileText className="w-4 h-4" />
+                <span>API 문서</span>
+              </Link>
+              <Link href="#" className="flex items-center space-x-1 text-gray-600 hover:text-gray-900">
+                <Clock className="w-4 h-4" />
+                <span>수집 이력</span>
+              </Link>
+            </nav>
           </div>
         </div>
+      </header>
 
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto pt-8 pb-12 px-4">
         {/* Progress Bar */}
-        <div className="mb-8 animate-slide-up delay-200">
+        <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon
               const isActive = currentStep === step.id
               const isCompleted = currentStep > step.id
@@ -368,19 +404,19 @@ export default function UserJoinPage() {
               return (
                 <div key={step.id} className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
                       isCompleted
-                        ? "bg-gradient-to-r from-purple-500 to-blue-600 text-white"
+                        ? "bg-blue-600 text-white"
                         : isActive
-                          ? "bg-purple-500 text-white"
+                          ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-400"
                     }`}
                   >
-                    {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-6 h-6" />}
+                    {isCompleted ? <CheckCircle className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                   </div>
                   <span
                     className={`text-xs font-medium ${
-                      isActive ? "text-purple-600" : isCompleted ? "text-purple-600" : "text-gray-400"
+                      isActive ? "text-blue-600" : isCompleted ? "text-blue-600" : "text-gray-400"
                     }`}
                   >
                     {step.title}
@@ -390,19 +426,17 @@ export default function UserJoinPage() {
             })}
           </div>
 
-          {/* 커스텀 프로그레스 바 */}
+          {/* 프로그레스 바 */}
           <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-500 to-blue-600 rounded-full transition-all duration-500 ease-out"
+              className="absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-500 opacity-50 animate-pulse"></div>
-            </div>
+            ></div>
           </div>
         </div>
 
         {/* Step Content */}
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm animate-slide-up delay-300">
+        <Card className="shadow-lg border-0">
           <CardHeader className="text-center">
             <CardTitle className="text-xl font-semibold text-gray-800">{steps[currentStep - 1]?.title}</CardTitle>
             <CardDescription className="text-gray-600">
@@ -445,35 +479,18 @@ export default function UserJoinPage() {
                       <div className="bg-gray-50 p-4 rounded-lg max-h-32 overflow-y-auto text-sm text-gray-600 border">
                         <h4 className="font-semibold mb-2">제1조 (목적)</h4>
                         <p className="mb-3">
-                          본 약관은 MoodSync(이하 "회사")가 제공하는 감정 기반 맞춤 추천 서비스(이하 "서비스")의 이용과
-                          관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
+                          본 약관은 OpenData API Search(이하 "회사")가 제공하는 서비스(이하 "서비스")의 이용과 관련하여
+                          회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.
                         </p>
 
                         <h4 className="font-semibold mb-2">제2조 (정의)</h4>
                         <p className="mb-3">
-                          1. "서비스"란 회사가 제공하는 감정 분석 및 음악, 도서, 활동 추천 서비스를 의미합니다.
+                          1. "서비스"란 회사가 제공하는 API 검색 및 관련 서비스를 의미합니다.
                           <br />
                           2. "이용자"란 본 약관에 따라 회사가 제공하는 서비스를 받는 회원을 말합니다.
                           <br />
                           3. "회원"이란 회사에 개인정보를 제공하여 회원등록을 한 자로서, 회사의 서비스를 지속적으로
                           이용할 수 있는 자를 말합니다.
-                        </p>
-
-                        <h4 className="font-semibold mb-2">제3조 (약관의 효력 및 변경)</h4>
-                        <p className="mb-3">
-                          1. 본 약관은 서비스를 이용하고자 하는 모든 이용자에 대하여 그 효력을 발생합니다.
-                          <br />
-                          2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 본 약관을 변경할 수 있습니다.
-                        </p>
-
-                        <h4 className="font-semibold mb-2">제4조 (서비스의 제공)</h4>
-                        <p>
-                          회사는 다음과 같은 서비스를 제공합니다:
-                          <br />- 감정 상태 분석 서비스
-                          <br />- 개인 맞춤형 음악 추천
-                          <br />- 개인 맞춤형 도서 추천
-                          <br />- 개인 맞춤형 활동 추천
-                          <br />- 기타 회사가 정하는 서비스
                         </p>
                       </div>
                     </div>
@@ -496,29 +513,11 @@ export default function UserJoinPage() {
                           회사는 다음의 목적을 위하여 개인정보를 처리합니다:
                           <br />- 회원 가입 및 관리
                           <br />- 서비스 제공 및 맞춤형 추천
-                          <br />- 감정 분석 및 데이터 처리
                           <br />- 고객 상담 및 불만 처리
-                          <br />- 서비스 개선 및 신규 서비스 개발
                         </p>
 
                         <h4 className="font-semibold mb-2">2. 수집하는 개인정보의 항목</h4>
-                        <p className="mb-3">
-                          필수항목: 이메일, 아이디, 이름, 비밀번호, 전화번호, 생년월일, 주소
-                          <br />
-                          선택항목: 감정 상태 정보, 서비스 이용 기록, 추천 선호도
-                        </p>
-
-                        <h4 className="font-semibold mb-2">3. 개인정보의 보유 및 이용기간</h4>
-                        <p className="mb-3">
-                          회원 탈퇴 시까지 보유하며, 탈퇴 후 즉시 파기합니다. 단, 관련 법령에 의해 보존이 필요한 경우
-                          해당 기간 동안 보관합니다.
-                        </p>
-
-                        <h4 className="font-semibold mb-2">4. 개인정보의 제3자 제공</h4>
-                        <p>
-                          회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다. 다만, 법령에 의해 요구되는
-                          경우는 예외로 합니다.
-                        </p>
+                        <p className="mb-3">필수항목: 이메일, 아이디, 이름, 비밀번호, 전화번호, 생년월일, 주소</p>
                       </div>
                     </div>
 
@@ -540,18 +539,7 @@ export default function UserJoinPage() {
                           회사는 다음과 같은 마케팅 정보를 제공합니다:
                           <br />- 신규 서비스 및 기능 안내
                           <br />- 이벤트 및 프로모션 정보
-                          <br />- 맞춤형 추천 콘텐츠
-                          <br />- 서비스 이용 팁 및 가이드
                         </p>
-
-                        <p className="mb-3">수신 방법: 이메일, SMS, 앱 푸시 알림</p>
-
-                        <p className="mb-3">
-                          동의 철회: 언제든지 회원정보 수정 페이지에서 수신 거부를 선택하거나 고객센터를 통해 철회할 수
-                          있습니다.
-                        </p>
-
-                        <p>본 동의는 선택사항이며, 동의하지 않아도 서비스 이용에는 제한이 없습니다.</p>
                       </div>
                     </div>
                   </div>
@@ -588,9 +576,9 @@ export default function UserJoinPage() {
                       type="button"
                       onClick={handleSendCode}
                       disabled={emailLoading || emailLocked || !form.userEmail}
-                      className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                      className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
                     >
-                      {emailLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "인증번호 발송"}
+                      {emailLoading ? "발송 중..." : "인증번호 발송"}
                     </Button>
                   </div>
                 </div>
@@ -613,7 +601,7 @@ export default function UserJoinPage() {
                         type="button"
                         onClick={handleVerifyCode}
                         disabled={verificationCode.length === 0}
-                        className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                        className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         인증 확인
                       </Button>
@@ -797,8 +785,7 @@ export default function UserJoinPage() {
                       <Button
                         type="button"
                         onClick={handleOpenPostcode}
-                        className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
-                        variant="outline"
+                        className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
                       >
                         <MapPin className="w-4 h-4 mr-2" />
                         주소 검색
@@ -820,6 +807,157 @@ export default function UserJoinPage() {
                       className="h-12"
                     />
                   </div>
+                            {/* 개발자 유형 선택 섹션 */}
+          <div>
+            <Label className="text-sm font-medium mb-2 flex items-center">
+              개발자 유형 <span className="text-red-500 ml-1">*</span>
+            </Label>
+            <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="frontend"
+                  name="developerType"
+                  value="frontend"
+                  checked={form.developerType === "frontend"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                  required
+                />
+                <label
+                  htmlFor="frontend"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-blue-600"
+                    >
+                      <polyline points="16 18 22 12 16 6"></polyline>
+                      <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">프론트엔드</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="backend"
+                  name="developerType"
+                  value="backend"
+                  checked={form.developerType === "backend"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="backend"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-green-600"
+                    >
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">백엔드</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="fullstack"
+                  name="developerType"
+                  value="fullstack"
+                  checked={form.developerType === "fullstack"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="fullstack"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-purple-600"
+                    >
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                      <polyline points="2 17 12 22 22 17"></polyline>
+                      <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">풀스택</span>
+                </label>
+              </div>
+
+              <div className="relative">
+                <input
+                  type="radio"
+                  id="other"
+                  name="developerType"
+                  value="other"
+                  checked={form.developerType === "other"}
+                  onChange={handleChange}
+                  className="peer absolute opacity-0"
+                />
+                <label
+                  htmlFor="other"
+                  className="flex flex-col items-center justify-center p-3 border rounded-lg cursor-pointer transition-all peer-checked:border-blue-500 peer-checked:bg-blue-50 h-full"
+                >
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mb-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-amber-600"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <span className="font-medium text-sm">기타</span>
+                </label>
+              </div>
+            </div>
+          </div>
                 </div>
 
                 {error && (
@@ -833,22 +971,22 @@ export default function UserJoinPage() {
             {/* Step 4: 완료 */}
             {currentStep === 4 && (
               <div className="text-center space-y-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full flex items-center justify-center mx-auto">
-                  <CheckCircle className="w-10 h-10 text-purple-600" />
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                  <CheckCircle className="w-10 h-10 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">회원가입 완료!</h3>
                   <p className="text-gray-600">
-                    MoodSync에 오신 것을 환영합니다.
+                    OpenData API Search에 오신 것을 환영합니다.
                     <br />
-                    잠시 후 로그인 페이지로 이동합니다.
+                    로그인 페이지로 이동하여 서비스를 이용해보세요.
                   </p>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                  <Heart className="w-4 h-4 text-pink-500" />
-                  <span>감정 기반 맞춤 추천 서비스</span>
-                  <Music className="w-4 h-4 text-blue-500" />
-                </div>
+                <Link href="/user/login">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2 h-12">
+                  로그인 페이지로 이동
+                </Button>
+                </Link>
               </div>
             )}
 
@@ -860,7 +998,7 @@ export default function UserJoinPage() {
                   variant="outline"
                   onClick={handlePrev}
                   disabled={currentStep === 1}
-                  className="h-12 px-6 border-purple-300 text-purple-600 hover:bg-purple-50"
+                  className="h-12 px-6 border-blue-300 text-blue-600 hover:bg-blue-50"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   이전
@@ -871,26 +1009,17 @@ export default function UserJoinPage() {
                     type="submit"
                     onClick={handleSubmit}
                     disabled={loading || !canProceedToNext()}
-                    className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                    className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        가입 중...
-                      </>
-                    ) : (
-                      <>
-                        회원가입
-                        <CheckCircle className="w-4 h-4 ml-2" />
-                      </>
-                    )}
+                    {loading ? "가입 중..." : "회원가입"}
+                    {!loading && <CheckCircle className="w-4 h-4 ml-2" />}
                   </Button>
                 ) : (
                   <Button
                     type="button"
                     onClick={handleNext}
                     disabled={!canProceedToNext()}
-                    className="h-12 px-6 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+                    className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     다음
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -902,46 +1031,26 @@ export default function UserJoinPage() {
         </Card>
 
         {/* Login Link */}
-        <div className="text-center mt-6 animate-slide-up delay-400">
+        <div className="text-center mt-6">
           <p className="text-gray-600">
             이미 계정이 있으신가요?{" "}
-            <Link href="/user/login" className="text-purple-600 font-semibold hover:text-purple-700">
+            <Link href="/user/login" className="text-blue-600 font-semibold hover:text-blue-700">
               로그인하기
             </Link>
           </p>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-sm text-gray-600">
+            © 2024 OpenData API Search. 기술 키워드 기반 오픈 데이터 검색 플랫폼
+          </div>
+        </div>
+      </footer>
 
       <Script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
-
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-slide-up {
-          animation: slide-up 0.8s ease-out;
-        }
-
-        .delay-200 {
-          animation-delay: 0.2s;
-        }
-
-        .delay-300 {
-          animation-delay: 0.3s;
-        }
-
-        .delay-400 {
-          animation-delay: 0.4s;
-        }
-      `}</style>
     </div>
   )
 }
