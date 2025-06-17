@@ -45,12 +45,9 @@
 - 형태소 분석 결과 리스트
 - 로그인/회원가입
 
-### 📝 테이블 명세 예시
+### 📝 테이블 명세 
+![테이블 명세서](./docs/Table Schema.png)
 
-| 테이블명 | 컬럼 | 설명 |
-|----------|------|------|
-| `user` | id, username, password | 사용자 계정 |
-| `search_log` | keyword, timestamp | 검색 기록 저장 |
 
 </details>
 
