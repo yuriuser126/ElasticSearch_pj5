@@ -98,6 +98,20 @@
 </details>
 
 ---
+<details>
+<summary>📘 Confluence Collaboration</summary>
+
+> 모든 팀원이 각자 맡은 역할에 따라 문서를 작성하고 실시간 피드백을 주고받으며 협업하였습니다.
+> 아래는 팀원별 Confluence 문서 링크입니다. (PDF 내보내기 버전은 `/docs` 폴더에 포함)
+
+- 👤 성유리 (PM) – [기획 및 일정 관리,프론트엔드 UI/UX 흐름 설계,Elastic](./docs/confluence-yuri.pdf) 
+- 👤 정재윤 – [백엔드 API 설계 및 동기화 구조,Elasticsearch 검색 및 형태소 분석 정리](./docs/confluence-jaeyoon.pdf)  
+- 👤 김채윤 – [리액트 및 jwt로그인, 서버구축](./docs/confluence-chaeyoon.pdf)   
+- 👤 손병관 – [swagger 자동문서화, Tableau Public 시각화](./docs/confluence-byungkwan.pdf)  
+
+</details>
+
+---
 
 <details>
 <summary>🌿 브랜치 전략 및 개발 규칙</summary>
