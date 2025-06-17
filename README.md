@@ -81,12 +81,19 @@
 <details>
 <summary>📦 릴리즈 내역</summary>
 
-### 🔖 [중간점검 릴리즈 (2025.06.10)](https://github.com/yuriuser126/ElasticSearch_pj5/releases)
+### 🔖 [중간점검 릴리즈 (2025.06.10)](https://github.com/yuriuser126/ElasticSearch_pj5/releases/tag/v1.0-mid)
 
 - 발표자료(PDF) 업로드  
 - 주간보고서 2종 포함  
 - 발표 대본 및 산출물 압축 파일 포함  
 - 기능 목록 및 기술 스택 요약
+
+### 🔖 [최종 발표 릴리즈 (2025.06.17)](https://github.com/yuriuser126/ElasticSearch_pj5/releases/tag/v1.0-final)
+
+- 발표 자료(PDF, PPTX, ZIP) 업로드  
+- 발표 대본(txt) 및 주간 보고서 이미지 포함  
+- 발표 자료 전용 압축본 포함 (`ElastiQuery.zip`)  
+- 기술 문서 및 API 문서 경로 안내 (`/docs` 폴더 참고)
 
 </details>
 
