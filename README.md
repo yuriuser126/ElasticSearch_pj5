@@ -37,7 +37,8 @@
 ![업무 흐름도](./docs/workflow.png)
 
 ### 🗂️ ERD
-![ERD](./docs/erd.png)
+![ERD1](./docs/erd1.png)
+![ERD2](./docs/erd2.png)
 
 ### 💻 화면 설계
 - 검색창 + 필터
