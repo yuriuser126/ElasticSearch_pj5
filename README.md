@@ -59,8 +59,8 @@
 <details>
 <summary>📷 시연 영상 및 발표 요약</summary>
 
-### 🎥 시연 영상
-> [영상 링크가 있다면 여기에](#)
+### 🎥 시연 영상  
+📺 [👉 유튜브로 시연 영상 보러가기](https://youtu.be/QaNWE73Mm_g?si=qnytRfteBIAMXFIs)
 
 ### 🧾 발표 요약
 
