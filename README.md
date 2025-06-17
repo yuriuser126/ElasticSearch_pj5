@@ -1,13 +1,8 @@
 # 🚀 ElasticSearch_pj5
-## 🏷️ MAIN Branch (안정 배포용)
-
-
-
-
 
 > **실시간 검색 및 데이터 동기화를 위한 Docker 기반 프로젝트**  
-> MongoDB ↔ Monstache ↔ Elasticsearch 연동을 통해 형태소 분석 기반의 검색 시스템을 구현했습니다.  
-> JWT 인증, Swagger 문서화, CSV/Excel 다운로드 기능 등 실무 기술 중심으로 개발했습니다.
+> MongoDB ↔ Monstache ↔ Elasticsearch 연동을 통해 **형태소 분석 기반 검색 시스템**을 구축했습니다.  
+> JWT 인증, Swagger 문서화, CSV/Excel 다운로드 등 실무 기술을 적용했습니다.
 
 ---
 
@@ -16,10 +11,10 @@
 - **진행 기간**: 2025.05.27 ~ 2025.06.17  
 - **인원 구성**: 4인 팀 프로젝트  
 - **기술 스택**:  
-  - Backend: Spring Boot, MyBatis, JWT  
-  - Frontend: React, Tailwind CSS  
-  - Infra: Docker, MongoDB, Monstache, Elasticsearch  
-  - 기타: Swagger, GitHub Actions, Render
+  - **Backend**: Spring Boot, MyBatis, JWT  
+  - **Frontend**: React, Tailwind CSS  
+  - **Infra**: Docker, MongoDB, Monstache, Elasticsearch  
+  - **기타**: Swagger, GitHub Actions, Render
 
 ---
 
@@ -28,113 +23,120 @@
 | 기능 | 설명 |
 |------|------|
 | 🔐 JWT 인증 | 사용자 로그인/인가 토큰 처리 |
-| 🔄 Monstache | MongoDB → Elasticsearch 실시간 연동 |
-| 🔍 형태소 분석 검색 | Elasticsearch + Nori 분석기 활용 |
-| 📊 Swagger | API 명세 및 테스트 환경 제공 |
-| ⬇️ CSV/Excel 다운로드 | API 데이터를 파일로 저장 가능 |
+| 🔄 Monstache 연동 | MongoDB → Elasticsearch 실시간 데이터 동기화 |
+| 🔍 형태소 검색 | Elasticsearch + Nori 분석기로 자연어 검색 |
+| 📊 Swagger | API 명세 및 테스트 제공 |
+| ⬇️ CSV/Excel 다운로드 | API 응답 데이터 다운로드 기능 |
 
 ---
 
-## 🖼️ 프로젝트 구조 및 설계
+<details>
+<summary>📁 프로젝트 구조 및 설계</summary>
 
-- **업무 흐름도**  
-  ![업무 흐름도](./docs/workflow.png) *(또는 텍스트 요약)*
-  
-- **ERD (논리/물리)**  
-  ![ERD](./docs/erd.png)
+### 📌 업무 흐름도
+![업무 흐름도](./docs/workflow.png)
 
-- **화면 설계**  
-  - 메인: 검색창 + 필터  
-  - 결과: 형태소 분석 결과 리스트  
-  - 인증: 로그인/회원가입  
+### 🗂️ ERD
+![ERD](./docs/erd.png)
 
-- **테이블 명세서**  
-  (예시)
-  | 테이블명 | 컬럼 | 설명 |
-  |----------|------|------|
-  | `user` | id, username, password | 사용자 계정 |
-  | `search_log` | keyword, timestamp | 검색 기록 |
+### 💻 화면 설계
+- 검색창 + 필터
+- 형태소 분석 결과 리스트
+- 로그인/회원가입
 
----
+### 📝 테이블 명세 예시
 
-## 📷 시연 영상
-> [영상 링크가 있다면 링크, 없다면 "PPT 참고"]
+| 테이블명 | 컬럼 | 설명 |
+|----------|------|------|
+| `user` | id, username, password | 사용자 계정 |
+| `search_log` | keyword, timestamp | 검색 기록 저장 |
+
+</details>
 
 ---
 
-## 📝 발표 자료 요약
-- **중간 발표자료 (2025.06.10)**  
-  - 프로젝트 개요, 기술 스택, 화면 설계, 기대 효과 정리  
-  - [🧾 주요 슬라이드 요약]  
-    - 도입 배경: 실시간 검색 시스템의 필요성  
-    - 기술 구성도: Docker 기반 통합 구조  
-    - 결과화면: 형태소 분석 검색 결과
+<details>
+<summary>📷 시연 영상 및 발표 요약</summary>
 
-- **주간 보고서**
-  - 1주차: 기획, 기술 조사, 환경 설정  
-  - 2주차: 기능 개발 및 API 문서화  
-  - 3주차: 테스트, 문서화, 발표 준비
+### 🎥 시연 영상
+> [영상 링크가 있다면 여기에](#)
+
+### 🧾 발표 요약
+
+#### 📌 중간 발표 (2025.06.10)
+- 실시간 검색의 필요성과 기술 구성 소개
+- Docker 기반 연동 흐름 설명
+- 형태소 검색 결과 시연
+
+#### 🗓️ 주간 보고서
+- 1주차: 기획, 기술 조사, 초기 세팅  
+- 2주차: 기능 구현, API 연동, 테스트  
+- 3주차: 배포, 문서화, 발표 준비
+
+</details>
 
 ---
 
+<details>
+<summary>📦 릴리즈 내역</summary>
 
-## 📦 릴리즈 기록
-> 중간 발표 자료, 보고서, 산출물 등은 GitHub 릴리즈에 아카이빙 되어 있습니다.  
-### 📌 [중간점검 릴리즈](https://github.com/yuriuser126/ElasticSearch_pj5/releases) - 2025.06.10
+### 🔖 [중간점검 릴리즈 (2025.06.10)](https://github.com/yuriuser126/ElasticSearch_pj5/releases)
 
-- 중간 발표자료(PPT) PDF 업로드  
-- 주간보고서 2종 첨부  
+- 발표자료(PDF) 업로드  
+- 주간보고서 2종 포함  
 - 발표 대본 및 산출물 압축 파일 포함  
-- 진행된 기능 목록 및 기술 스택 요약 포함  
-- 해당 릴리즈는 아카이빙 용도로 관리됩니다.
+- 기능 목록 및 기술 스택 요약
+
+</details>
 
 ---
 
-## 🔚 프로젝트 회고 (선택)
+<details>
+<summary>🌿 브랜치 전략 및 개발 규칙</summary>
 
-- 팀원 A: 협업과 커밋 전략의 중요성을 느꼈다.  
-- 팀원 B: Monstache를 처음 다뤄보며 실시간 데이터 파이프라인 개념을 익힘  
-- ...
+### 🔧 브랜치 전략
 
----
+| 브랜치 | 역할 |
+|--------|------|
+| 🟢 `main` | 배포 전용, 직접 커밋 ❌ |
+| 🟡 `develop` | 통합 개발 브랜치 |
+| 🔵 `feature/*` | 기능별 개인 작업 브랜치 |
 
-## 🗃️ 원문서/첨부 자료
+### 📎 커밋/작업 규칙
+- `main` 브랜치로 직접 작업/PR 금지  
+- 항상 최신 `develop` 기준으로 작업  
+- 민감 정보(.env, 키 등) 절대 커밋 금지  
+- 작업 중 `develop` 최신 pull → 충돌 최소화
 
-- 업무 분장서, 기술서, 테이블 명세서, PPT 등은 [docs/] 폴더 내에 포함
+### 💻 Sourcetree 기준 브랜치 체크아웃
+1. Sourcetree 실행 후 저장소 열기  
+2. 상단 **Fetch** 클릭 → 원격 브랜치 갱신  
+3. **origin/브랜치명** 우클릭 → **Checkout**
 
-
----
-
-## 🗃️ 브랜치 및 개발 규칙
-
-> ⚠️ **직접 커밋 금지!**  
-> 안정적인 배포를 위해 모든 개발은 개인 브랜치 → develop → main 순으로 진행해주세요.
-
-## ⚠️ 브랜치 간략 주의사항
-- main : 배포용, 직접 수정 금지  
-- develop : 개발 통합 브랜치  
-- 기능 작업은 개인 브랜치에서 진행  
-- PR 시 최신 develop 기준으로 작업 필수
-
-## 📎 주의사항
-- 본 브랜치는 `develop` 브랜치를 기준으로 생성되었습니다.
-- PR 대상은 항상 `develop`입니다. `main` 브랜치로 직접 작업 및 PR 금지는 필수입니다.
-- 중요한 보안 정보(키, 패스워드 등)는 절대 커밋하지 마세요.
-- 작업 진행 중에는 주기적으로 `develop` 최신 상태를 pull 하여 충돌을 최소화하세요.
-
-## 💻 Sourcetree에서 팀원 브랜치 가져오기
-
-1. Sourcetree를 실행하고 저장소를 연다.
-2. 상단 메뉴에서 **Fetch** 버튼을 클릭한다. 🔃  
-   (원격 저장소의 브랜치 목록이 갱신된다)
-3. 왼쪽 메뉴에서 **Remotes/origin/브랜치명**을 확인한다. 🔍
-4. 가져올 브랜치에서 우클릭 후 **Checkout**을 선택한다. 🖱️  
-   (로컬 브랜치가 생성되고 전환된다)
-5. 로컬 브랜치에서 작업을 진행한다.
-
-> ⚠️ 팀원이 작업한 브랜치를 원격에 **push**하지 않았다면 목록에 나타나지 않습니다.
+</details>
 
 ---
 
+<details>
+<summary>📝 프로젝트 회고 (GitHub 링크)</summary>
+
+- 👤 [성유리(PM)](https://github.com/memberA) 
+- 👤 [정재윤](https://github.com/tjrdl?tab=repositories) 
+- 👤 [김채윤]( https://github.com/tjrdl?tab=repositories) 
+- 👤 [손병관]( https://github.com/tjrdl?tab=repositories) 
+
+</details>
+
+
 ---
 
+<details>
+<summary>📁 첨부 자료 및 원문서</summary>
+
+- 업무 분장표  
+- 기술 명세서  
+- 테이블 명세서  
+- 발표 자료(PPT)  
+- `/docs` 폴더 내 포함됨
+
+</details>
