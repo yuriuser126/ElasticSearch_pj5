@@ -1,8 +1,12 @@
 # 🚀 ElasticSearch_pj5
 
-> **실시간 검색 및 데이터 동기화를 위한 Docker 기반 프로젝트**  
+> **기술 키워드 기반 오픈 데이터 검색 & 트렌드 분석 플랫폼**  
 > MongoDB ↔ Monstache ↔ Elasticsearch 연동을 통해 **형태소 분석 기반 검색 시스템**을 구축했습니다.  
-> JWT 인증, Swagger 문서화, CSV/Excel 다운로드 등 실무 기술을 적용했습니다.
+> JWT 인증, Swagger 문서화, CSV/Excel 다운로드 및 변환환 등 실무 기술을 적용했습니다.
+> Elasticsearch(인덱스,문서 관리, 검색, 집계API)
+
+
+![프로젝트 포스터](doc/poster.png)
 
 ---
 
