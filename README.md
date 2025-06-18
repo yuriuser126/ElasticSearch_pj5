@@ -65,25 +65,33 @@
 
 ### 🧾 발표 요약
 
-로그인 수집이력 그래프 검색후
-![로그인수집이력그래프검색후](https://github.com/user-attachments/assets/fddf6285-be1c-4e66-b5b3-f437f8415710)
+## 로그인 수집이력 그래프 검색후  
+<br>
+![로그인수집이력그래프검색후](https://github.com/your-username/your-repo-name/blob/main/images/login-graph.gif?raw=true)
 
-로그인회원가입 비밀번호찾기 소셜로그인
-![로그인회원가입비밀번호찾기 소셜로그인](https://github.com/user-attachments/assets/39c358e7-b9f0-4b05-b1db-493867c59d70)
+## 로그인/회원가입/비밀번호찾기/소셜로그인  
+<br>
+![로그인회원가입비밀번호찾기 소셜로그인](https://github.com/your-username/your-repo-name/blob/main/images/login-signup-social.gif?raw=true)
 
-버튼(api문서, 즐겨찾기, 사이트방문)
-![api문서,즐겨찾기,사이트방문](https://github.com/user-attachments/assets/0c282181-0ecb-4b0a-8fb4-5172beb52772)
+## 버튼(api문서, 즐겨찾기, 사이트방문)  
+<br>
+![버튼 기능](https://github.com/your-username/your-repo-name/blob/main/images/buttons.gif?raw=true)
 
-Stackoverflow top 10 지표화
-![메인 스택오버플로우 top10](https://github.com/user-attachments/assets/f27afd38-5c4e-42f5-9e8c-96c8c6a0e1be)
+## Stackoverflow top 10 지표화  
+<br>
+![스택오버플로우 top10](https://github.com/your-username/your-repo-name/blob/main/images/stackoverflow-top10.gif?raw=true)
 
-수집이력페이지 즐겨찾기
-![수집이력/즐겨찾기](https://github.com/user-attachments/assets/00bdce4c-ede5-49b9-8f10-2927bef124ee)
+## 수집이력페이지 즐겨찾기  
+<br>
+![수집이력 즐겨찾기](https://github.com/your-username/your-repo-name/blob/main/images/favorites.gif?raw=true)
 
-ubuntu 서버 배포
-- 프론트엔드: Ubuntu 서버에 배포 완료
-- 백엔드: 추후 연동 예정 (작업 중)
-![ubuntu 서버](https://github.com/user-attachments/assets/9a0a4bce-a68f-47ca-b4a0-4f05db6b5ddd)
+## Ubuntu 서버 배포  
+- 프론트엔드: Ubuntu 서버에 배포 완료  
+- 백엔드: 추후 연동 예정 (작업 중)  
+<br>
+![ubuntu 서버](https://github.com/your-username/your-repo-name/blob/main/images/ubuntu-deploy.gif?raw=t)
+
+
 
 #### 📌 중간 발표 (2025.06.10)
 - 실시간 검색의 필요성과 기술 구성 소개
