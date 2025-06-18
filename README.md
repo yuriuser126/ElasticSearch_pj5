@@ -6,7 +6,7 @@
 > Elasticsearch(인덱스,문서 관리, 검색, 집계API)
 
 
-![프로젝트 포스터](doc/poster.png)
+![프로젝트 포스터](docs/poster.png)
 
 ---
 
