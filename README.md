@@ -1,5 +1,9 @@
 # 🚀 ElasticSearch_pj5
 
+[![Release](https://img.shields.io/github/v/release/yuriuser126/ElasticSearch_pj5)](https://github.com/yuriuser126/ElasticSearch_pj5/releases)
+[![License](https://img.shields.io/github/license/yuriuser126/ElasticSearch_pj5)](./LICENSE)
+
+
 > **기술 키워드 기반 오픈 데이터 검색 & 트렌드 분석 플랫폼**  
 > MongoDB ↔ Monstache ↔ Elasticsearch 연동을 통해 **형태소 분석 기반 검색 시스템**을 구축했습니다.  
 > JWT 인증, Swagger 문서화, CSV/Excel 다운로드 및 변환환 등 실무 기술을 적용했습니다.
@@ -17,8 +21,47 @@
 - **기술 스택**:  
   - **Backend**: Spring Boot, MyBatis, JWT  
   - **Frontend**: React, Tailwind CSS  
+  <details>
+    <summary><strong>🎨 Frontend 상세 스택 보기</strong></summary>
+
+    - **Framework**: Next.js, React, TypeScript  
+    - **Styling**: Tailwind CSS, Radix UI  
+    - **폼 관리**: react-hook-form  
+      - ⚠️ Zod는 설치만 되어 있으며 실제 사용되지 않음  
+    - **상태 관리**: Zustand  
+    - **라우팅**:  
+      - Next.js App Router 기반  
+      - `useRouter`, `usePathname`, `useSearchParams` 등 사용  
+      - 일부 `react-router-dom` 도입  
+    - **API 통신**: Axios, Fetch API  
+
+  </details>
   - **Infra**: Docker, MongoDB, Monstache, Elasticsearch  
-  - **기타**: Swagger, GitHub Actions, Render
+  - **기타**: Swagger, GitHub Actions  
+
+---
+
+## 🤝 협업 툴 및 자동화
+
+- **Slack**: 팀 소통 및 실시간 알림 채널 운영  
+- **Confluence**: 팀원별 문서 관리 및 기능별 페이지 편집 권한 부여  
+- **Jira**: 스크럼 보드로 업무 분배 및 상태 관리, 완료 상태 알림 자동화  
+- **GitHub**:  
+  - GitHub Actions를 이용한 CI/CD 파이프라인 구축  
+  - Push 시 Slack 알림 연동  
+  - GitHub Flow 전략을 적용한 효율적인 버전 관리 및 협업  
+
+<details>
+  <summary><strong>🛠️ 협업 도구 상세 보기</strong></summary>
+
+| 도구          | 역할 및 기능                                      | 자동화 및 특징                                |
+|---------------|-------------------------------------------------|---------------------------------------------|
+| Slack         | 팀 내 실시간 커뮤니케이션 및 알림                 | Jira, GitHub 이벤트 알림 자동 수신          |
+| Confluence    | 프로젝트 문서화, 핸드북 관리                      | 팀원별 개인 페이지 제공 및 편집 권한 관리    |
+| Jira          | 업무 스크럼 보드 관리                             | 완료 상태 시 Slack 알림 자동 전송             |
+| GitHub        | 코드 저장소 및 버전 관리                          | Push 시 Slack 알림, GitHub Actions CI/CD 자동화 |
+
+</details>
 
 ---
 
@@ -41,13 +84,16 @@
 ![업무 흐름도](./docs/workflow.png)
 
 ### 🗂️ ERD
-![ERD1](./docs/erd1.png)
-![ERD2](./docs/erd2.png)
+
+| ERD1 | ERD2 |
+|-------|-------|
+| ![ERD1](./docs/erd1.png) | ![ERD2](./docs/erd2.png) |
 
 ### 💻 화면 설계
-- 검색창 + 필터
-- 형태소 분석 결과 리스트
+- 검색창 + 필터 + 스택오버플로우 실시간 top 10
+- 형태소 분석 검색 결과 리스트
 - 로그인/회원가입
+- 수집이력(마이페이지) 즐겨찾기 및 사용자별, 유저별 지표화
 
 ### 📝 테이블 명세 
 ![테이블 명세서](./docs/Table Schema.png)
@@ -67,29 +113,29 @@
 
 ## 로그인 수집이력 그래프 검색후  
 <br>
-![로그인수집이력그래프검색후](https://github.com/user-attachments/assets/fddf6285-be1c-4e66-b5b3-f437f8415710)
+![로그인수집이력그래프검색후](docs/gif/login-mypage-graf.gif)
 
 ## 로그인/회원가입/비밀번호찾기/소셜로그인  
 <br>
-![로그인회원가입비밀번호찾기 소셜로그인](https://github.com/user-attachments/assets/39c358e7-b9f0-4b05-b1db-493867c59d70)
+![로그인회원가입비밀번호찾기 소셜로그인](docs/gif/totallogin-sociallogin.gif)
 
 ## 버튼(api문서, 즐겨찾기, 사이트방문)  
 <br>
-![api문서,즐겨찾기,사이트방문](https://github.com/user-attachments/assets/0c282181-0ecb-4b0a-8fb4-5172beb52772)
+![api문서,즐겨찾기,사이트방문](docs/gif/mypagestar.gif)
 
 ## Stackoverflow top 10 지표화  
 <br>
-![메인 스택오버플로우 top10](https://github.com/user-attachments/assets/f27afd38-5c4e-42f5-9e8c-96c8c6a0e1be)
+![메인 스택오버플로우 top10](docs/gif/main-stackoverflow-chart.gif)
 
 ## 수집이력페이지 즐겨찾기  
 <br>
-![수집이력/즐겨찾기](https://github.com/user-attachments/assets/00bdce4c-ede5-49b9-8f10-2927bef124ee)
+![수집이력/즐겨찾기](docs/gif/button.gif)
 
 ## Ubuntu 서버 배포  
 - 프론트엔드: Ubuntu 서버에 배포 완료  
 - 백엔드: 추후 연동 예정 (작업 중)  
 <br>
-![ubuntu 서버](https://github.com/user-attachments/assets/9a0a4bce-a68f-47ca-b4a0-4f05db6b5ddd)
+![ubuntu 서버](docs/gif/server-front.gif)
 
 
 
@@ -133,10 +179,11 @@
 > 모든 팀원이 각자 맡은 역할에 따라 문서를 작성하고 실시간 피드백을 주고받으며 협업하였습니다.
 > 아래는 팀원별 Confluence 문서 링크입니다. (PDF 내보내기 버전은 `/docs` 폴더에 포함)
 
-- 👤 성유리 (PM) – [기획 및 일정 관리,프론트엔드 UI/UX 흐름 설계,Elastic](./docs/confluence-yuri.pdf) 
-- 👤 정재윤 – [백엔드 API 설계 및 동기화 구조,Elasticsearch 검색 및 형태소 분석 정리](./docs/confluence-jaeyoon.pdf)  
-- 👤 김채윤 – [리액트 및 jwt로그인, 서버구축](./docs/confluence-chaeyoon.pdf)   
-- 👤 손병관 – [swagger 자동문서화, Tableau Public 시각화](./docs/confluence-byungkwan.pdf)  
+- 👤 성유리 (PM) – [기획 및 일정 관리, 프론트엔드 UI/UX 흐름 설계, Elastic 검색기](./docs/confluence-pdf/confluence-yuri.pdf)  
+- 👤 정재윤 – [백엔드 API 설계 및 동기화 구조, Elasticsearch 검색 및 형태소 분석 정리](./docs/confluence-pdf/confluence-jaeyoon.pdf)  
+- 👤 김채윤 – [리액트 및 JWT 로그인, 서버 구축](./docs/confluence-pdf/confluence-chaeyoon.pdf)  
+- 👤 손병관 – [Swagger 자동문서화, Tableau Public 시각화](./docs/confluence-pdf/confluence-byungkwan.pdf)  
+
 
 </details>
 
@@ -184,10 +231,11 @@
 <details>
 <summary>📁 첨부 자료 및 원문서</summary>
 
-- 업무 분장표  
-- 기술 명세서  
-- 📋 [테이블 명세서](./docs/Table Schema.png)
-- 발표 자료(PPT)
+
+- 📄 [업무 분장표](./docs/Team_Task_Assignment_Phase5.pdf)
+- 📄 [화면 설계서](./docs/UI-Design-Document/README.md)  
+- 📄 [테이블 명세서](./docs/Table%20Schema.png)
+- 📄 [발표 자료는 릴리즈 페이지에서 확인하세요](https://github.com/yuriuser126/ElasticSearch_pj5/releases)
 - 📄 [프로그램 기술서 보러가기](./docs/tech-doc.md)
 - `/docs` 폴더 내 포함됨
 
