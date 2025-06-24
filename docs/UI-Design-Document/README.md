@@ -29,102 +29,102 @@
 ## 1. 화면설계서 메인  
 > 전체 서비스의 흐름과 기능별 연결 관계를 시각화한 개요 페이지입니다.
 
-![01](./01_UI_Screenshots.png)
+![01](./01_UI%20Screenshots.png)
 
 ---
 
 ## 2. 메인페이지 검색창  
 > 키워드 입력 및 필터링 가능한 검색창이 상단에 고정된 홈 화면입니다.
 
-![02](./02_UI_Screenshots.png)
+![02](./02_UI%20Screenshots.png)
 
 ---
 
 ## 3. 검색 결과 리스트  
 > 형태소 분석 기반으로 검색된 게시글 리스트가 출력되며, 필터링 옵션이 적용 가능합니다.
 
-![03](./03_UI_Screenshots.png)
+![03](./03_UI%20Screenshots.png)
 
 ---
 
 ## 4. API 문서 이동 전 화면  
 > 로그인 후, API 문서(스웨거)로 이동할 수 있는 버튼이 제공됩니다.
 
-![04](./04_UI_Screenshots.png)
+![04](./04_UI%20Screenshots.png)
 
 ---
 
 ## 5. Swagger 문서화 & CSV 변환  
 > API 문서화와 함께 CSV/Excel로 결과를 다운로드할 수 있는 기능 화면입니다.
 
-![05](./05_UI_Screenshots.png)
+![05](./05_UI%20Screenshots.png)
 
 ---
 
 ## 6. 수집이력 즐겨찾기  
 > 사용자가 조회한 기록을 리스트로 확인하며, 즐겨찾기로 관리할 수 있습니다.
 
-![06](./06_UI_Screenshots.png)
+![06](./06_UI%20Screenshots.png)
 
 ---
 
 ## 7. 사용자별/시간대별 검색 지표 시각화  
 > 개인별 검색 패턴 및 시간대별 검색 데이터를 그래프와 차트로 시각화한 화면입니다.
 
-![07](./07_UI_Screenshots.png)
+![07](./07_UI%20Screenshots.png)
 
 ---
 
 ## 8. 로그인 화면  
 > ID/비밀번호 입력을 통한 기본 로그인, 소셜 로그인 UI입니다.
 
-![08](./08_UI_Screenshots.png)
+![08](./08_UI%20Screenshots.png)
 
 ---
 
 ## 9. 회원가입 - 약관 동의  
 > 필수 이용 약관에 대한 체크박스가 포함된 회원가입 1단계입니다.
 
-![09](./09_UI_Screenshots.png)
+![09](./09_UI%20Screenshots.png)
 
 ---
 
 ## 10. 이메일 인증 확인  
 > 이메일 인증번호를 입력하여 본인 확인을 수행합니다.
 
-![10](./10_UI_Screenshots.png)
+![10](./10_UI%20Screenshots.png)
 
 ---
 
 ## 11. 회원정보 입력  
 > 아이디, 비밀번호 등 계정 정보를 입력하는 회원가입 단계입니다.
 
-![11](./11_UI_Screenshots.png)
+![11](./11_UI%20Screenshots.png)
 
 ---
 
 ## 12. 가입 완료  
 > 회원가입이 완료된 후 출력되는 완료 안내 화면입니다.
 
-![12](./12_UI_Screenshots.png)
+![12](./12_UI%20Screenshots.png)
 
 ---
 
 ## 13. 비밀번호 찾기  
 > 등록된 이메일을 입력하여 비밀번호 재설정 링크를 요청하는 화면입니다.
 
-![13](./13_UI_Screenshots.png)
+![13](./13_UI%20Screenshots.png)
 
 ---
 
 ## 14. 비밀번호 재설정  
 > 새로운 비밀번호를 입력할 수 있는 UI입니다.
 
-![14](./14_UI_Screenshots.png)
+![14](./14_UI%20Screenshots.png)
 
 ---
 
 ## 15. 비밀번호 변경 완료  
 > 비밀번호가 정상적으로 변경되었음을 알리는 완료 페이지입니다.
 
-![15](./15_UI_Screenshots.png)
+![15](./15_UI%20Screenshots.png)
