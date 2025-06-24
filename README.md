@@ -113,29 +113,35 @@
 
 ## 로그인 수집이력 그래프 검색후  
 <br>
-![로그인수집이력그래프검색후](docs/gif/login-mypage-graf.gif)
+
+![로그인수집이력그래프검색후](./docs/gif/login-mypage-graf.gif)
 
 ## 로그인/회원가입/비밀번호찾기/소셜로그인  
 <br>
-![로그인회원가입비밀번호찾기 소셜로그인](docs/gif/totallogin-sociallogin.gif)
+
+![로그인회원가입비밀번호찾기 소셜로그인](./docs/gif/totallogin-sociallogin.gif)
 
 ## 버튼(api문서, 즐겨찾기, 사이트방문)  
 <br>
-![api문서,즐겨찾기,사이트방문](docs/gif/mypagestar.gif)
+
+![api문서,즐겨찾기,사이트방문](./docs/gif/mypagestar.gif)
 
 ## Stackoverflow top 10 지표화  
 <br>
-![메인 스택오버플로우 top10](docs/gif/main-stackoverflow-chart.gif)
+
+![메인 스택오버플로우 top10](./docs/gif/main-stackoverflow-chart.gif)
 
 ## 수집이력페이지 즐겨찾기  
 <br>
-![수집이력/즐겨찾기](docs/gif/button.gif)
+
+![수집이력/즐겨찾기](./docs/gif/button.gif)
 
 ## Ubuntu 서버 배포  
 - 프론트엔드: Ubuntu 서버에 배포 완료  
 - 백엔드: 추후 연동 예정 (작업 중)  
 <br>
-![ubuntu 서버](docs/gif/server-front.gif)
+
+![ubuntu 서버](./docs/gif/server-front.gif)
 
 
 
