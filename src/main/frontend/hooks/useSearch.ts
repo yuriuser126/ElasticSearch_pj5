@@ -3,6 +3,8 @@
 import { useState, useCallback } from "react"
 // 직접 axios를 사용하는 대신, 설정이 완료된 api 클라이언트를 가져옵니다.
 import api from '@/lib/api/base';
+//리디렉트 사용
+import { useRouter } from "next/navigation";
 import { logSearchQuery } from '@/lib/api/analysis';
 import type { SearchResult, SearchFilters } from "@/types"
 
@@ -10,6 +12,8 @@ import type { SearchResult, SearchFilters } from "@/types"
 
 
 export const useSearch = (initialQuery: string = "") => {
+
+  const router = useRouter();//리디렉트
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,7 +37,7 @@ export const useSearch = (initialQuery: string = "") => {
   const size = 10
 
 
-  const search = useCallback(async (searchQuery: string, searchParams: any = {}, searchFilters?:SearchFilters) => {
+  const search = useCallback(async (searchQuery: string, searchParams: any = {}, searchFilters?: SearchFilters) => {
     if (!searchQuery.trim()) {
       setResults([])
       setQuery("")
@@ -54,21 +58,23 @@ export const useSearch = (initialQuery: string = "") => {
       // 검색어 로깅 API 호출 (성공적으로 동작하던 부분)
       await logSearchQuery(searchQuery);
 
-        console.log("🔍 검색 API 호출:", {
-            query: searchQuery,
-            page: currentPage,
-            size: currentSize,
-            params: searchParams
-        });
+      console.log("🔍 검색 API 호출:", {
+        query: searchQuery,
+        page: currentPage,
+        size: currentSize,
+        params: searchParams
+      });
 
       // ★★★ 이 부분이 수정되었습니다! ★★★
       // 직접 axios.get 대신, baseURL이 설정된 'api' 인스턴스를 사용합니다.
       const response = await api.get('/es/questions', {
-        params: { query: searchQuery, ...searchFilters,
-            page: currentPage,
-            size: currentSize,
-            // 다른 필터들도 전달
-            ...searchParams},
+        params: {
+          query: searchQuery, ...searchFilters,
+          page: currentPage,
+          size: currentSize,
+          // 다른 필터들도 전달
+          ...searchParams
+        },
       })
       // ★★★★★★★★★★★★★★★★★★★★★
 
@@ -80,7 +86,7 @@ export const useSearch = (initialQuery: string = "") => {
         ? response.data
         : response.data.results || [];
 
-        
+
       // question_id를 id로 없으면 index사용용, tags를 keywords로 변환
       const apiResults: SearchResult[] = rawResults.map((r, index) => ({
         ...r,
@@ -111,7 +117,15 @@ export const useSearch = (initialQuery: string = "") => {
 
       const endTime = Date.now();
       setSearchTime((endTime - startTime) / 1000);
-    } catch (err) {
+    } catch (err : any) {
+
+      if (err.message === "Unauthorized") {
+        // 🔐 인증 안 됐을 때 로그인 페이지로 이동
+        router.push("/user/login");
+        return; // 리디렉션 후 아래 코드 실행 방지
+      }
+
+
       setError("검색 중 오류가 발생했습니다.")
       setResults([])
       setTotalResults(0)
