@@ -121,7 +121,7 @@
 - 수집이력(마이페이지) 즐겨찾기 및 사용자별, 유저별 지표화
 
 ### 📝 테이블 명세 
-![테이블 명세서](./docs/Table Schema.png)
+![테이블 명세서](./docs/Table%20Schema.png)
 
 
 </details>
