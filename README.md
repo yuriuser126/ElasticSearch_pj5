@@ -19,25 +19,40 @@
 - **진행 기간**: 2025.05.27 ~ 2025.06.17  
 - **인원 구성**: 4인 팀 프로젝트  
 - **기술 스택**:  
-  - **Backend**: Spring Boot, MyBatis, JWT  
-  - **Frontend**: React, Tailwind CSS  
+  - **Backend**: Spring Boot, MyBatis, JWT 기반 인증  
+  - **Frontend**: React, Tailwind CSS, Zustand 등 (상세 내용은 아래 접이식 참조)  
   <details>
     <summary><strong>🎨 Frontend 상세 스택 보기</strong></summary>
 
     - **Framework**: Next.js, React, TypeScript  
     - **Styling**: Tailwind CSS, Radix UI  
-    - **폼 관리**: react-hook-form  
-      - ⚠️ Zod는 설치만 되어 있으며 실제 사용되지 않음  
+    - **폼 관리**: react-hook-form (Zod는 설치만)  
     - **상태 관리**: Zustand  
-    - **라우팅**:  
-      - Next.js App Router 기반  
-      - `useRouter`, `usePathname`, `useSearchParams` 등 사용  
-      - 일부 `react-router-dom` 도입  
+    - **라우팅**: Next.js App Router + 일부 react-router-dom  
     - **API 통신**: Axios, Fetch API  
 
   </details>
-  - **Infra**: Docker, MongoDB, Monstache, Elasticsearch  
-  - **기타**: Swagger, GitHub Actions  
+- **Infra**: Docker, MongoDB, Monstache 연동, Elasticsearch  
+- **기타**: Swagger API 문서화, GitHub Flow 브랜치 관리 전략 및 Sourcetree를 통한 협업  
+ 
+
+---
+
+<details>
+  <summary>🔑 주요 기술 및 특화 요소 (클릭해서 보기)</summary>
+
+- **형태소 분석(Nori)**: 한국어 및 영어 각각에 최적화된 Elasticsearch 형태소 분석기로 검색 정확도 향상  
+- **Monstache 연동**: MongoDB 데이터의 실시간 Elasticsearch 동기화  
+- **Bool 쿼리 검색**: 오타 및 유사도 반영한 고급 검색 구현  
+- **네이버 맞춤법 검사기**: 한글 오타 보정으로 검색 품질 향상  
+- **JWT 기반 Spring Security**: 보안성 높은 인증 시스템 구축  
+- **config.toml 설정**: Monstache 네임스페이스와 인덱스 매핑 관리  
+- **React 키워드별 검색 기능 & 페이지네이션**: 사용자 친화적 UI와 데이터 페이징 처리  
+- **인프라**: AWS EC2 배포 시도, Ubuntu+VirtualBox 환경 프론트 배포 완료  
+- **상태 관리**: Zustand 도입으로 효율적인 상태 관리 구현  
+
+</details>
+
 
 ---
 
@@ -64,6 +79,16 @@
 </details>
 
 ---
+
+
+## 🐞 주요 이슈 및 협업 관리
+
+- 서버 메모리 이슈가 간헐적으로 발생했으나, 리소스 관리로 해결함.
+- 병합 충돌 없이 Git Flow 전략과 Sourcetree를 활용한 안정적인 브랜치 관리가 이루어짐.
+- GitHub Actions CI/CD는 사용하지 않았으며, GitHub Flow 기반 브랜치 관리와 Sourcetree로 협업함.
+
+---
+
 
 ## 🧩 주요 기능
 
@@ -224,10 +249,10 @@
 <details>
 <summary>📝 프로젝트 개인별 (GitHub 링크)</summary>
 
-- 👤 [성유리(PM)](https://github.com/memberA) 
+- 👤 [성유리(PM)](https://github.com/yuriuser126/ElasticSearch_pj5.git)) 
 - 👤 [정재윤](https://github.com/tjrdl?tab=repositories) 
-- 👤 [김채윤]( https://github.com/tjrdl?tab=repositories) 
-- 👤 [손병관]( https://github.com/tjrdl?tab=repositories) 
+- 👤 [김채윤](https://github.com/Chaeyoon-k?tab=repositories) 
+- 👤 [손병관](https://github.com/sonbg2025?tab=repositories) 
 
 </details>
 
