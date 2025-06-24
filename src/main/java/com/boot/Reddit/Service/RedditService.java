@@ -1,6 +1,9 @@
 package com.boot.Reddit.Service;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -224,5 +227,38 @@ public class RedditService {
 
         StackRedditQuestionRepository.saveAll(questions);
     }
+
+    // reddit 상태 체크 함수
+    public String checkRedditHealth() throws MalformedURLException {
+        // 토큰 발급받기
+        String token = getAccessToken();
+        String subreddit="java";
+        String limit ="1";
+        String url = "https://oauth.reddit.com/r/" + subreddit + "/hot.json?limit=" + limit;
+
+        URL redditURL = new URL(url);
+        try {
+        		HttpURLConnection conn = (HttpURLConnection) redditURL.openConnection();
+                conn.setConnectTimeout(2000);
+                conn.setReadTimeout(2000);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+//            conn.setRequestProperty("User-Agent", "MyRedditApp/1.0 (by u/userAgent)");
+                conn.setRequestProperty("User-Agent", "MyRedditApp/1.0 userAgent");
+                int responseCode = conn.getResponseCode();
+            System.out.println("Reddit API response code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                    return "UP";
+                }
+                else {
+                    return "DOWN";
+                }
+
+        } catch (IOException e) {
+            return "DOWN";
+        }
+    }
+
 }
 

@@ -4,11 +4,14 @@ package com.boot.HackerNews.Service;
 import com.boot.HackerNews.DTO.HackerNewsItem;
 import com.boot.HackerNews.Repository.HackerNewsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.boot.Elastic.ElasticService;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,9 +42,38 @@ public class HackerNewsService {
         return results;
     }
 
+
     public void saveTopStoriesToMongo(int count) {
         List<HackerNewsItem> topStories = getTopStories(count);
         hackerNewsRepository.saveAll(topStories);
+        System.out.println("Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
+    }
+
+    @Scheduled(fixedRate = 10000)
+    public void saveToMongo() {
+        int count = 10; // 자동으로 저장할 개수 설정
+        List<HackerNewsItem> topStories = getTopStories(count);
+        hackerNewsRepository.saveAll(topStories);
+        System.out.println("자동으로 Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
+    }
+
+    public String healthHeackerNews() {
+        // Hacker News API의 상태를 확인하는 로직
+        // 예시로 API 호출을 시도하고 응답 코드를 확인하여 상태 반환
+        try {
+            URL url = new URL(TOP_STORIES_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            int responseCode = connection.getResponseCode();
+            if (responseCode >= 200 && responseCode < 400) {
+                return "UP";
+            } else {
+                return "DOWN";
+            }
+        }
+        catch (Exception e) {
+            return "DOWN";
+        }
     }
     
     

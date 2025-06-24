@@ -97,7 +97,7 @@ public class SecurityConfig {
                                 "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
                                 "/favicon.ico", "/reddit/**", "/api/convert/**",
                                 "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends",
-                                "/api/stackoverflow/fetch/elastic/one","/api/favorite", "/user/**", "/checkId", "/pwdMailConfirm","/changePassword"
+                                "/api/stackoverflow/fetch/elastic/one","/api/favorite", "/user/**", "/checkId", "/pwdMailConfirm","/changePassword", "/health/**"
 
                         ).permitAll()
                         .requestMatchers("/user/me").authenticated()

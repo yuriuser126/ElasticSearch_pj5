@@ -2,6 +2,8 @@ package com.boot.StackOverflow.Service;
 
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +162,31 @@ public class StackOverflowService {
         }
     }
 
-    
+    public String checkStackOverflowHealth() {
+        try{
+            String url = "https://api.stackexchange.com/2.3/questions"
+                    + "?order=desc"
+                    + "&sort=activity"
+                    + "&site=stackoverflow"
+                    + "&pagesize=1"
+                    + "&key=" + apiKey;
+
+            URL stack_url = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) stack_url.openConnection();
+            conn.setConnectTimeout(2000); // 2초
+            conn.setReadTimeout(2000);
+            conn.setRequestMethod("GET");
+            int responseCode = conn.getResponseCode();
+            if (responseCode >= 200 && responseCode < 400) {
+                return "UP";
+            }
+            else{
+                return "DOWN";
+            }
+        }
+        catch(Exception e){
+            return "DOWN";
+        }
+    }
 
 }
