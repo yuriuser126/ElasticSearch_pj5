@@ -1,7 +1,8 @@
 # 🚀 ElasticSearch_pj5
 
 [![Release](https://img.shields.io/github/v/release/yuriuser126/ElasticSearch_pj5)](https://github.com/yuriuser126/ElasticSearch_pj5/releases)
-[![License](https://img.shields.io/github/license/yuriuser126/ElasticSearch_pj5)](./LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 
 
 > **기술 키워드 기반 오픈 데이터 검색 & 트렌드 분석 플랫폼**  
@@ -271,3 +272,10 @@
 - `/docs` 폴더 내 포함됨
 
 </details>
+
+---
+
+## 📝 License
+
+This project is licensed under the terms of the **Apache License 2.0**.  
+See the [LICENSE](./LICENSE) file for details.
