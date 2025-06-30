@@ -3,7 +3,11 @@
 import type React from "react"
 import { ExternalLink, Download, Star, Calendar, Database, Tag, FileText, Code } from "lucide-react"
 import type { SearchResult } from "@/types"
-import { HackerNewsItem } from "@/types"; // `@/types/index.ts`는 index라 생략 가능
+import { HackerNewsItem } from "@/types";
+import {useRouter} from "next/navigation";
+
+
+
 
 interface SearchResultCardProps {
   result: SearchResult
@@ -13,13 +17,20 @@ interface SearchResultCardProps {
 const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerClick }) => {
   const handleExternalLink = (e: React.MouseEvent) => {
     e.stopPropagation()
-    window.open(result.url, "_blank", "noopener,noreferrer")
+    const url = result.link || "http://localhost:3000";
+    window.open(url, "_blank", "noopener,noreferrer");
   }
+
+  // const handleSwaggerClick = (e: React.MouseEvent) => {
+  //   e.stopPropagation()
+  //   onSwaggerClick(result)
+  // }
 
   const handleSwaggerClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    onSwaggerClick(result)
-  }
+    const url = result.swaggerUrl || "http://localhost:8485/test";
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
 
   // 키워드 배열 준비
   const keywords = (Array.isArray(result.tags) ? result.tags : result.title?.split(" ") || [])
@@ -32,6 +43,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
     result: HackerNewsItem;
     onSwaggerClick: () => void;
     };
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 p-6">
@@ -59,7 +71,11 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
       </div>
 
       {/* 설명 */}
-      <p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">{result.description}</p>
+      {/*<p className="text-gray-700 mb-4 line-clamp-3 leading-relaxed">{result.description}</p>*/}
+      <p
+          className="text-gray-700 mb-4 line-clamp-3 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: result.body }}
+      />
 
       {/* 키워드 태그 */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -113,9 +129,10 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
           </span>
         </div>
 
+
         <div className="flex items-center gap-2">
           {/* Swagger 문서 버튼 */}
-          {result.swaggerUrl && (
+
             <button
               onClick={handleSwaggerClick}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 text-sm font-medium"
@@ -123,7 +140,54 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
               <FileText className="w-4 h-4" />
               API 문서
             </button>
-          )}
+
+
+          <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  // 사용자 정보 요청
+                  const userRes = await fetch("http://localhost:8485/user/me", {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                      "Content-Type": "application/json",
+                    }
+                  });
+                  if (!userRes.ok) {
+                    alert("로그인이 필요합니다.");
+                    return;
+                  }
+                  const user = await userRes.json();
+
+                  // 즐겨찾기 등록 요청 보내기
+                  const res = await fetch("http://localhost:8485/api/favorite", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                      userId: user.userId,     // 서버에서 받은 사용자 ID
+                      documentId: result.id,   // 현재 카드의 문서 ID
+                      title: result.title,
+                      url: result.url,
+                    }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert("즐겨찾기에 추가되었습니다!");
+                  } else {
+                    alert("이미 등록되었습니다");
+                  }
+                } catch (err) {
+                  alert("네트워크 오류"+err +"///");
+                }
+              }}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+          >
+            즐겨찾기
+          </button>
 
           {/* 외부 링크 버튼 */}
           <button

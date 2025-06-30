@@ -1,4 +1,3 @@
-
 "use client"
 
 import type React from "react"
@@ -227,7 +226,7 @@ export default function UserJoinPage() {
 
   // 주소 검색
   const handleOpenPostcode = () => {
-      
+
     /*   로그인 후 리디렉션 등으로 인해 window.daum이 사라진 경우에도,
     주소 검색 버튼을 누르면 다시 스크립트를 로드하고 팝업을 띄움
     팝업이 무조건 정상 동작함 */
@@ -316,8 +315,7 @@ export default function UserJoinPage() {
       console.error("회원가입 중 오류 발생:", err.response?.data || err.message)
 
       // 아이디 중복 에러 처리
-      if (err.response?.data?.message?.includes("아이디") || err.response?.data?.message?.includes("중복"))
-      {
+      if (err.response?.data?.message?.includes("아이디") || err.response?.data?.message?.includes("중복")) {
         setError("이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.")
       } else {
         setError(err.response?.data?.message || "회원가입 중 오류가 발생했습니다.")
@@ -582,7 +580,7 @@ useEffect(() => {
                     </div>
                   </div>
                 )}
-{/* 
+
                 {emailVerified && (
                   <Alert className="border-green-200 bg-green-50">
                     <CheckCircle className="h-4 w-4 text-green-600" />
@@ -590,7 +588,7 @@ useEffect(() => {
                       이메일 인증이 완료되었습니다!
                     </AlertDescription>
                   </Alert>
-                )} */}
+                )}
 
                 {emailError && (
                   <Alert className="border-red-200 bg-red-50">

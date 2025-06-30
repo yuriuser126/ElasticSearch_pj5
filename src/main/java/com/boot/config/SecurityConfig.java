@@ -1,9 +1,4 @@
-
 package com.boot.config;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.boot.z_config.security.jwt.JwtAuthenticationFilter;
 import com.boot.z_config.security.jwt.JwtAuthenticationEntryPoint;
@@ -19,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -66,21 +62,22 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-    
 
+
+    // Swagger 및 정적 리소스 허용 경로
     private static final String[] SWAGGER_PERMIT_ALL_URLS = {
-        "/swagger-ui.html",
-        "/swagger-ui/**",
-        "/v3/api-docs/**",
-        "/swagger-resources/**",
-        "/webjars/**"
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
     };
 
     private static final String[] STATIC_HTML_PERMIT_ALL_URLS = {
-        "/*.html", 
-        "/css/**", 
-        "/js/**",
-        "/favicon.ico"
+            "/*.html",
+            "/css/**",
+            "/js/**",
+            "/favicon.ico"
     };
 
     @Bean
@@ -97,10 +94,10 @@ public class SecurityConfig {
                         .requestMatchers(STATIC_HTML_PERMIT_ALL_URLS).permitAll() // static HTML 및 리소스 경로
                         .requestMatchers(
                                 "/user/login", "/user/register", "/", "/auth/**", "/resources/**", "/js/**", "/css/**", "/images/**",
-                                "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**", "/pwdMailConfirm", "/changePassword",
-                                "/favicon.ico", "/reddit/**", "/api/convert/**", "/checkId",
+                                "/checkExistingSession", "/loginForm", "/joinForm", "/joinProc", "/mailConfirm", "/oauth2/**",
+                                "/favicon.ico", "/reddit/**", "/api/convert/**",
                                 "/login/oauth2/**", "/oauth/naver", "/oauth/kakao", "/test/**", "/api/**", "/api/ping","/es/**","/hackernews/**","/api/stackoverflow/**","/questions","/api/trends",
-                                "/api/stackoverflow/fetch/elastic/one"
+                                "/api/stackoverflow/fetch/elastic/one","/api/favorite", "/user/**", "/checkId", "/pwdMailConfirm","/changePassword"
 
                         ).permitAll()
                         .requestMatchers("/user/me").authenticated()
@@ -140,9 +137,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:3000"); // React origin
-        configuration.addAllowedOrigin("http://localhost:8485"); // 현재 서버 포트도 추가
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://localhost:8485");
+        configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
 

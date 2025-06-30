@@ -17,6 +17,4 @@ public class Question {
     private String link;
 
     private List<String> tags;
-    private String source; // "Reddit" or "StackOverflow"
-
 }

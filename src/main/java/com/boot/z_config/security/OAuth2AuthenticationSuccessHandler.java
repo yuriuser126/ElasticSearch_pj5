@@ -34,7 +34,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         jwtCookie.setHttpOnly(true);
         jwtCookie.setMaxAge(1 * 24 * 60 * 60);
 
-        
+
         if (request.isSecure()) {
             jwtCookie.setSecure(true);
         }
@@ -42,9 +42,9 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         response.addCookie(jwtCookie);
 //        response.sendRedirect("/");
         response.sendRedirect("http://localhost:3000");
-        
-       
+
+
     }
-        
-   
+
+
     }

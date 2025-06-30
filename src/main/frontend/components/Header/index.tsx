@@ -26,7 +26,7 @@ import { useState } from "react";
     };
 
 
-  
+
   return (
       <header className="bg-white shadow-sm border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -76,7 +76,7 @@ import { useState } from "react";
                 </Link>
               </Button>
 
-              
+
             {/* <Button
               variant={pathname === '/' ? 'default' : 'ghost'}
               onClick={() => router.push('/')}
@@ -102,7 +102,7 @@ import { useState } from "react";
       </header>
    );
   };
-   
+
 
 
 export default Header;

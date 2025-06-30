@@ -2,10 +2,16 @@ package com.boot.Elastic;
 
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +39,9 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @RestController
 @RequestMapping("/es")
 @Tag(name = "Elasticsearch API", description = "Elasticsearch와 연동된 CRUD 및 검색 기능 제공")
@@ -41,6 +49,9 @@ public class ElasticController {
 
     @Autowired
     private ElasticConfig elasticConfig;
+
+    @Autowired
+    private ElasticService elasticService;
 
 
     @Operation(summary = "문서 추가", description = "my_index 인덱스에 새 문서를 추가합니다.")
@@ -71,48 +82,194 @@ public class ElasticController {
             return "문서를 찾을 수 없습니다.";
         }
     }
-    
+
     @Operation(summary = "모든 질문 조회 또는 검색", description = "query 파라미터가 있으면 검색, 없으면 전체 조회합니다.")
     @GetMapping("/questions")
-    public Object getOrSearchQuestions(@RequestParam(name = "query", required = false) String query) throws IOException {
-        ElasticsearchClient client = elasticConfig.getClient();
+    public Object getOrSearchQuestions
+    	(@RequestParam(name = "query", required = false) String query,
+    	@RequestParam(name = "page", defaultValue = "1") int page,
+    	@RequestParam(name = "size", defaultValue = "10") int size,
+         @RequestParam(name = "category", required = false) String category,
+         @RequestParam(name = "format", required = false) String format,
+         @RequestParam(name = "sortBy", required = false) String sortBy
+
+    	) throws Exception {
+    	ElasticsearchClient client = elasticConfig.getClient();
+
+    	int from = (page - 1) * size;
+
+        String searchQuery;
+        String searchCategory;
+        if (query != null && !query.isEmpty()) {
+            if(category != null && !category.isEmpty()) {
+                query = query + " " + category;
+            }
+            else {
+                query = query;
+            }
+            //String correctedQuery = correctKoreanTypo(query);
+//            query = query + " " + category;
+            // 서비스 단에서 번역 수행
+            searchQuery = elasticService.translate(query);
+
+            log.info("번역된 쿼리: {}", searchQuery);
+            log.info("category: {}", category);
+            log.info("format: {}", format);
+            log.info("sortBy: {}", sortBy);
+        } else {
+            searchQuery = query;
+        }
+//        if(category != null && !category.isEmpty()) {
+//            searchCategory = elasticService.translate(category);
+//        }
+//        else {
+//            searchCategory = category;
+//        }
+
+        String indexName;
+        if(format != null && !format.isEmpty()) {
+            if ("stackoverflow".equals(format)) {
+                indexName = "mydb.stackoverflowquestions";
+            } else if ("reddit".equals(format)) {
+                indexName = "mydb.redditquestions";
+            } else if ("hackernews".equals(format)) {
+                indexName = "mydb.hackernews";
+            } else {
+                indexName = "mydb.*";
+            }
+        }
+        else {
+            indexName = "mydb.*";
+        }
+
+
 
         SearchRequest request = SearchRequest.of(s -> s
-    		.index("mydb.*")  // 여러 인덱스 지정
-//    		.index("reddit_items,stackoverflow,hackernews")  // 여러 인덱스 지정
-            .size(1000)
-            .query(q -> {
-                if (query == null || query.isEmpty()) {
-                    return q.matchAll(m -> m);
-                } else {
-                    return q.match(m -> m
-                        .field("title")
-                        .query(query)
-                    );
-                }
-            })
+                        .index(indexName)  // 정확한 인덱스로 고정하는 것이 더 안전
+                        .from(from) // 'from' 값으로 페이징 시작 위치 지정
+                        .size(20)
+                        .query(q -> {
+                            if (searchQuery == null || searchQuery.isEmpty()) {
+                                log.info("elastic controller : " + searchQuery);
+                                return q.matchAll(m -> m);
+                            } else {
+                                log.info("elastic controller2 : " + searchQuery);
+                                return q.bool(b -> b
+                                                .should(m -> m.multiMatch(mm -> mm
+                                                        .fields("title^5", "body^2", "tags")
+                                                        .query(searchQuery)
+                                                        .type(TextQueryType.BestFields)
+                                                        .fuzziness("AUTO")
+                                                        .operator(Operator.Or)
+                                                        .minimumShouldMatch("70%")
+
+                                                ))
+                                        // 카테고리 필터링 추가 - 검색 정확도는 높아지지만 데이터셋 부족으로 사용 x
+//                                .filter(f -> {
+//                                    if (searchCategory != null && !searchCategory.isEmpty()) {
+//
+//                                        return f.term(t -> t.field("tag").value(searchCategory));
+//                                    } else {
+//                                        return null; // 필터 없음
+//                                    }
+//                                })
+                                );
+                            }
+                        })
+                        // 하이라이트 <em> 태그 붙어서 나옴
+                        .highlight(h -> h
+                                .fields("title", f -> f)
+                                .fields("body", f -> f)
+                                .fields("tags", f -> f)
+                        )
+
+                        // 정렬 조건
+                        .sort(sortBuilder -> {
+                            if ("date".equals(sortBy)) {
+                                return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
+                            } else if ("popularity".equals(sortBy)) {
+                                return sortBuilder.field(f -> f.field("view_count").order(SortOrder.Desc));
+                            } else if ("relevance".equals(sortBy)) {
+                                return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
+                            } else {
+                                // 기본 정렬 조건 (예: _score 내림차순)
+                                return sortBuilder.field(f -> f.field("_score").order(SortOrder.Desc));
+                            }
+                        })
         );
 
         SearchResponse<Map> response = client.search(request, Map.class);
 
-        return response.hits().hits().stream()
-            .map(hit -> (Map<String, Object>) hit.source())
-            .collect(Collectors.toList());
+        // 총 검색 결과 개수
+        long total = response.hits().total().value();
+
+        // 검색 결과 리스트
+        List<Map<String, Object>> hits = response.hits().hits().stream()
+                .map(hit -> (Map<String, Object>) hit.source())
+                .collect(Collectors.toList());
+
+        // 응답에 결과 + 전체 개수 같이 보내기 (Map이나 DTO로 감싸서)
+        return Map.of(
+                "results", hits,
+                "total", total
+        );
     }
 
+    public String stripHtmlTags(String html) {
+        if (html == null) return null;
+        // 기본적인 HTML 태그 제거 (단, <script>, <style> 등은 제거되지 않을 수 있음)
+        return html.replaceAll("<[^>]*>", "");
+    }
 
-    
+    // html 코드 <p> 같은거 없애는 코드인데 하이라이트 때문에 잠시 뺴둠
+//    return response.hits().hits().stream()
+//                .map(hit -> {
+//        Map<String, Object> source = (Map<String, Object>) hit.source();
+//        if (source.containsKey("body") && source.get("body") != null) {
+//            Object bodyObj = source.get("body");
+//            if (bodyObj instanceof String) {
+//                String body = (String) bodyObj;
+//                source.put("body", stripHtmlTags(body));
+//            }
+//        }
+//        return source;
+//    })
+//            .collect(Collectors.toList());
+//
+//
+//}
+//
+//public String stripHtmlTags(String html) {
+//    if (html == null) return null;
+//    // 기본적인 HTML 태그 제거
+//    return html.replaceAll("<[^>]*>", "");
+//}
 
 
+
+// 한글 교정기 현재 사용 안됨
+//    public String correctKoreanTypo(String text) {
+//
+//        String apiUrl = "http://localhost:5001/correct?text=" + URLEncoder.encode(text, StandardCharsets.UTF_8);
+//        RestTemplate restTemplate = new RestTemplate();
+//        Map<String, String> response = restTemplate.getForObject(apiUrl, Map.class);
+//        return response.get("corrected");
+//    }
 
 }
+
+		/*요청받은 페이지 번호와 페이지 크기를 기반으로
+		Elasticsearch 검색에서 사용할 'from' 값을 계산합니다.
+		'from'은 검색 결과에서 몇 번째 문서부터 가져올지를 의미합니다.
+		예를 들어, page=2, size=10 이면 from = (2 - 1) * 10 = 10 이 되어
+		11번째 문서부터 결과를 가져오게 됩니다.*/
 
 
 
 /*
  *     @Operation(summary = "모든 질문 조회", description = "mydb.stackoverflowquestions 인덱스에서 전체 질문을 조회합니다.")
 		컨트롤러 작성하실때 mapping 위에 operation해서 위 같은 방식으로 작성하시면 간결하게 설명까지 나오니까 해주세요.
-		
+
 		@Tag		Controller에 대한 설명을 명시하는 어노테이션
 		@Tag	name	API 그룹의 이름을 지정하는 속성
 		@Tag	description	API 그룹의 설명을 지정하는 속성
@@ -123,10 +280,10 @@ public class ElasticController {
 		@Operation	parameter	API에 대한 파라미터를 지정하는 속성
 		@Schema		모델에 대한 설명을 명시하는 어노테이션
 		@Schema	description	모델 자체 혹은 컬럼에 대한 설명을 하는 속성
-	
+
 		이런 식으로 사용하시면 좋고 DTO도 해주시면 정말 깔끔해집니다.
-		
-		
+
+
 		나머지는 제가 다 하겠습니다.
  * */
 

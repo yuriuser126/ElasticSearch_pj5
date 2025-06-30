@@ -88,12 +88,12 @@ export default function UserLoginPage() {
 
 // export default function Component() {
   return (
-     
+
     <div className="min-h-screen bg-gray-50">
     <Header />
-      
-   
-    
+
+
+
 
       {/* Main Content */}
       <main className="max-w-md mx-auto pt-16 pb-12 px-4">
@@ -248,7 +248,7 @@ export default function UserLoginPage() {
         </div>
       </footer>
     </div>
-    
+
   );
 }
 

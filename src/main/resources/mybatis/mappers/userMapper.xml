@@ -1,4 +1,3 @@
-
 <!DOCTYPE mapper
     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -25,7 +24,7 @@
 <!--		)-->
 
 <!--	</insert>-->
-	
+
 	<insert id="userJoin">
     INSERT INTO user_info (
         userId, userPw, userName, userTel,
@@ -64,8 +63,8 @@
 	<!-- 유저 비밀번호 수정 -->
 	<update id="updateUserPwInfo" parameterType="java.util.HashMap">
 	    UPDATE user_info
-	    SET userPw = #{encodedPassword}
-	    WHERE userId = #{userId}
+	    SET USERPW = #{encodedPassword}
+		WHERE USERID = #{userId}
 	</update>
 
 	<!-- 회원가입시 아이디 중복 체크 -->
