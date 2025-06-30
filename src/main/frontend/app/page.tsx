@@ -84,10 +84,10 @@ const HomePage: React.FC = () => {
  // 총 페이지 수 계산
   const totalPages = Math.ceil(totalResults / RESULTS_PER_PAGE);
 
+  const [currentView, setCurrentView] = useState<"search"|"history">("search")
   // 페이지 변경 핸들러
   const handlePageChange = useCallback((page: number) => {
     console.log("📄 페이지 변경 요청:", page, "범위:", `1-${totalPages}`);
-  const [currentView, setCurrentView] = useState<"search"|"history">("search")
 
 
     if (page >= 1 && page <= totalPages && page !== currentPage) {

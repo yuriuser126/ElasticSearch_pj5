@@ -67,6 +67,14 @@ dependencies {
 
 	implementation 'org.jsoup:jsoup:1.17.2'
 
+
+
+	
+
+}
+
+application {
+    mainClassName = 'com.boot.BootElasticSearchpj5Application'
 }
 
 tasks.named('test') {

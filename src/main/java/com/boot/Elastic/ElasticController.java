@@ -1,24 +1,8 @@
 package com.boot.Elastic;
 
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.SortOrder;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
-import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
-import co.elastic.clients.elasticsearch.core.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-
-import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -28,9 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.IndexRequest;
@@ -39,7 +27,7 @@ import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.web.client.RestTemplate;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -110,9 +98,10 @@ public class ElasticController {
             //String correctedQuery = correctKoreanTypo(query);
 //            query = query + " " + category;
             // 서비스 단에서 번역 수행
-            searchQuery = elasticService.translate(query);
+//            searchQuery = elasticService.translate(query);
 
-            log.info("번역된 쿼리: {}", searchQuery);
+//            log.info("번역된 쿼리: {}", searchQuery);
+            searchQuery = query;
             log.info("category: {}", category);
             log.info("format: {}", format);
             log.info("sortBy: {}", sortBy);
