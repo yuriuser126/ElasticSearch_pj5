@@ -10,7 +10,7 @@ import { useState } from "react";
 
 
  const Header = () => {
-    // 훅과 변수 선언은 return문 바깥에 위치
+    
     const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
     const loading = useAuthStore((state) => state.loading);
     const logoutUser = useAuthStore((state) => state.logoutUser);

@@ -30,15 +30,15 @@ import Header from "@/components/Header"
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-async function pingServer() {
-  try {
-    const res = await fetch(`${apiUrl}/ping`);
-    const text = await res.text();
-    console.log('서버 응답:', text);
-  } catch (error) {
-    console.error('서버 연결 실패:', error);
-  }
-}
+// async function pingServer() {
+//   try {
+//     const res = await fetch(`${apiUrl}/ping`);
+//     const text = await res.text();
+//     console.log('서버 응답:', text);
+//   } catch (error) {
+//     console.error('서버 연결 실패:', error);
+//   }
+// }
 
 
 // export default function HomePage() {
@@ -84,13 +84,8 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
     <Header />
     
-   
-
-
-
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!query && <PingTest />}
+        {/* {!query && <PingTest />} */}
         {/* 검색 영역 */}
         <div className="text-center mb-12">
           {!query && (

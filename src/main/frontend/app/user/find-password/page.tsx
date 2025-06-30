@@ -80,7 +80,6 @@ export default function PasswordRecoveryPreview() {
 
      const steps = [
     { id: 1, title: "정보 입력", icon: Mail },
-    // { id: 2, title: "인증 확인", icon: CheckCircle },
     { id: 2, title: "새 비밀번호 설정", icon: Lock },
     { id: 3, title: "설정완료", icon: Check },
   ]
@@ -151,7 +150,7 @@ export default function PasswordRecoveryPreview() {
 //아이디 확인
 const handleCheckId = async () => {
   try {
-    const res = await checkUserIdExists(form.userId) // 이렇게 사용
+    const res = await checkUserIdExists(form.userId) 
     if (res.success) {
       setIdValid(true)
       setIdLocked(true)
@@ -501,8 +500,8 @@ const handleCheckId = async () => {
     if (form.userPw === form.pwdConfirm && form.userPw.length >= 8) {
       try {
         const res = await changePassword(form.userId, form.userPw);
-        console.log("🔐 전송된 userId:", form.userId);
-        console.log("🔐 전송된 userPw:", form.userPw);
+        console.log("전송된 userId:", form.userId);
+        console.log("전송된 userPw:", form.userPw);
         if (res.success) {
           setPasswordChanged(true);
           setActiveStep(3); // 성공하면 다음 단계로 이동
