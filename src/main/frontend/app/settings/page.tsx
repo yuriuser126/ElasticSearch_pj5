@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Save, Bell, Shield, Database, Globe } from "lucide-react"
+import { Save, Bell, Shield, Database, Globe, Lock, Server, RefreshCcw, AlertCircle, UploadCloud } from "lucide-react"
 import Navigation from "@/components/ui/Navigation"
 import ErrorBoundary from "@/components/ErrorBoundary"
 
@@ -14,6 +14,11 @@ const SettingsPage: React.FC = () => {
     dataRetention: "30",
     language: "ko",
     theme: "light",
+    encryption: true,
+    whitelist: "",
+    twoFA: false,
+    performanceAlert: true,
+    backupFrequency: "weekly",
   })
 
   const handleSave = () => {
@@ -38,11 +43,11 @@ const SettingsPage: React.FC = () => {
         <div className="px-6 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="grid gap-6">
-              {/* API 설정 */}
+              {/* 수집 설정
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-blue-600" />
-                  API 설정
+                  수집 설정
                 </h2>
                 <div className="space-y-4">
                   <div>
@@ -57,7 +62,7 @@ const SettingsPage: React.FC = () => {
                     <p className="text-xs text-gray-500 mt-1">외부 API 연동을 위한 인증 키입니다.</p>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* 수집 설정 */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -114,6 +119,90 @@ const SettingsPage: React.FC = () => {
                       onChange={(e) => setSettings({ ...settings, notifications: e.target.checked })}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* 데이터 보안 설정 */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-blue-600" />
+                  데이터 보안 설정
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">데이터 암호화</label>
+                    <input
+                      type="checkbox"
+                      checked={settings.encryption}
+                      onChange={(e) => setSettings({ ...settings, encryption: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">허용된 IP 목록 (쉼표로 구분)</label>
+                    <input
+                      type="text"
+                      value={settings.whitelist}
+                      onChange={(e) => setSettings({ ...settings, whitelist: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="192.168.0.1, 10.0.0.1"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">2단계 인증 (2FA)</label>
+                    <input
+                      type="checkbox"
+                      checked={settings.twoFA}
+                      onChange={(e) => setSettings({ ...settings, twoFA: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* 시스템 성능 모니터링 */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Server className="w-5 h-5 text-blue-600" />
+                  시스템 성능 모니터링
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-gray-700">성능 저하 알림</label>
+                    <input
+                      type="checkbox"
+                      checked={settings.performanceAlert}
+                      onChange={(e) => setSettings({ ...settings, performanceAlert: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">CPU, 메모리, 네트워크 상태 및 리소스 사용량을 모니터링합니다.</p>
+                </div>
+              </div>
+
+              {/* 백업 및 복원 관리 */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <UploadCloud className="w-5 h-5 text-blue-600" />
+                  백업 및 복원 관리
+                </h2>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">백업 주기</label>
+                    <select
+                      value={settings.backupFrequency}
+                      onChange={(e) => setSettings({ ...settings, backupFrequency: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="daily">매일</option>
+                      <option value="weekly">매주</option>
+                      <option value="monthly">매월</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">백업 다운로드</button>
+                    <button className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">복원</button>
                   </div>
                 </div>
               </div>

@@ -15,6 +15,10 @@ interface SearchResultCardProps {
 }
 
 const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerClick }) => {
+  //리디렉션
+  const router = useRouter();
+
+
   const handleExternalLink = (e: React.MouseEvent) => {
     e.stopPropagation()
     const url = result.link || "http://localhost:3000";
@@ -145,6 +149,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
           <button
               onClick={async (e) => {
                 e.stopPropagation();
+                console.log("즐겨찾기 버튼 클릭, 로그인 체크 시작");
                 try {
                   // 사용자 정보 요청
                   const userRes = await fetch("http://localhost:8485/user/me", {
@@ -154,8 +159,10 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
                       "Content-Type": "application/json",
                     }
                   });
+                  console.log("userRes.ok:", userRes.ok);
                   if (!userRes.ok) {
                     alert("로그인이 필요합니다.");
+                    router.push("/login"); //리디렉션
                     return;
                   }
                   const user = await userRes.json();

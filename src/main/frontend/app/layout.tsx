@@ -1,7 +1,12 @@
+
+
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+// import { useState } from "react" 
+// import SettingsQuickAccess from "@/components/SettingsQuickAccess"
+import SettingsWrapper from "@/components/SettingsWrapper"; // 클라이언트 컴포넌트 분리
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,9 +22,22 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  //  const [settings, setSettings] = useState({
+  //   theme: 'auto',
+  //   language: 'ko',
+  // })
   return (
+    // <html lang={settings.language}>
+    //   <body className={`${inter.className} ${settings.theme === 'dark' ? 'dark' : ''}`}>
+    //     {children}
+    //     <SettingsQuickAccess settings={settings} setSettings={setSettings} />
+    //   </body>
+    // </html>
     <html lang="ko">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        {children}
+        <SettingsWrapper />
+      </body>
     </html>
   )
 }

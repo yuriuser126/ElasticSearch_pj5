@@ -107,7 +107,8 @@ const HomePage: React.FC = () => {
 
   return (
 
-    <div className="min-h-screen bg-gray-50">
+    // <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
     <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -116,7 +117,7 @@ const HomePage: React.FC = () => {
         <div className="text-center mb-12">
           {!query && (
             <div className="mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">오픈 데이터 API를 쉽게 찾아보세요</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">오픈 데이터 API를 쉽게 찾아보세요</h2>
               <p className="text-lg text-gray-600 mb-6">
                 정부, 공공기관에서 제공하는 다양한 API와 Swagger 문서를 한 곳에서 검색할 수 있습니다
               </p>
@@ -134,7 +135,7 @@ const HomePage: React.FC = () => {
                   <button
                     key={keyword}
                     onClick={() => search(keyword)}
-                    className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                    className="px-4 py-2 bg-card border border-gray-200 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors"
                   >
                     {keyword}
                   </button>
@@ -152,7 +153,7 @@ const HomePage: React.FC = () => {
             {/* 검색 결과 정보 */}
             <div className="flex items-center justify-between mb-6">
               <div className="text-sm text-gray-600">
-                "<span className="font-medium text-gray-900">{query}</span>"에 대한 검색 결과{" "}
+                "<span className="font-medium text-foreground">{query}</span>"에 대한 검색 결과{" "}
                 {!loading && (
                   <>
                     약 <span className="font-medium">{totalResults.toLocaleString()}</span>개 (
@@ -172,7 +173,7 @@ const HomePage: React.FC = () => {
             {loading && (
               <div className="space-y-6">
                 {[...Array(3)].map((_, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+                  <div key={index} className="bg-card rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
                     <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
                     <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
@@ -190,8 +191,8 @@ const HomePage: React.FC = () => {
             {error && (
               <div className="text-center py-12">
                 <Database className="w-16 h-16 text-red-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">검색 중 오류가 발생했습니다</h3>
-                <p className="text-gray-500">{error}</p>
+                <h3 className="text-lg font-medium text-foreground mb-2">검색 중 오류가 발생했습니다</h3>
+                <p className="text-muted-foreground">{error}</p>
               </div>
             )}
 
@@ -212,8 +213,8 @@ const HomePage: React.FC = () => {
             {!loading && !error && results.length === 0 && (
               <div className="text-center py-12">
                 <SearchIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">검색 결과가 없습니다</h3>
-                <p className="text-gray-500 mb-6">다른 키워드로 검색해보시거나 철자를 확인해보세요</p>
+                <h3 className="text-lg font-medium text-foreground mb-2">검색 결과가 없습니다</h3>
+                <p className="text-muted-foreground mb-6">다른 키워드로 검색해보시거나 철자를 확인해보세요</p>
 
                 <div className="space-y-2 text-sm text-gray-600">
                   <p>검색 제안:</p>
@@ -261,7 +262,7 @@ const HomePage: React.FC = () => {
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <SearchIcon className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">통합 검색</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">통합 검색</h3>
               <p className="text-gray-600">
                 정부, 공공기관의 다양한 오픈 데이터 API를 키워드로 쉽게 검색할 수 있습니다
               </p>
@@ -271,7 +272,7 @@ const HomePage: React.FC = () => {
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Code className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">API 문서</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">API 문서</h3>
               <p className="text-gray-600">각 API의 Swagger 문서를 바로 확인하고 사용법을 쉽게 파악할 수 있습니다</p>
             </div>
 
@@ -279,7 +280,7 @@ const HomePage: React.FC = () => {
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Database className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">실시간 정보</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-2">실시간 정보</h3>
               <p className="text-gray-600">최신 업데이트된 API 정보와 사용 통계를 실시간으로 제공합니다</p>
             </div>
           </div>

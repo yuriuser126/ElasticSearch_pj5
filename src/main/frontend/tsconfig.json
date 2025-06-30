@@ -1,27 +1,71 @@
 {
   "compilerOptions": {
+    // baseUrl은 paths 옵션을 사용할 때 꼭 필요합니다.
+    // 여기서는 프로젝트 루트(".")를 기준으로 alias 경로를 설정합니다.
+    //SettingsQuickAccess from "@/components/SettingsQuickAccess" 이거 해결용으로 사용
+    "baseUrl": ".",
+
+    // 브라우저 환경 및 최신 ECMAScript 기능 지원
     "lib": ["dom", "dom.iterable", "esnext"],
+
+    // JS 파일도 컴파일 대상에 포함
     "allowJs": true,
+
+    // ECMAScript 타겟 버전
     "target": "ES6",
+
+    // 외부 라이브러리 타입 검사 제외하여 속도 향상
     "skipLibCheck": true,
+
+    // 엄격한 타입 검사 활성화
     "strict": true,
+
+    // 출력물 생성 안함 (Next.js가 빌드 담당)
     "noEmit": true,
+
+    // CommonJS 호환성 옵션
     "esModuleInterop": true,
+
+    // 최신 모듈 시스템 사용
     "module": "esnext",
+
+    // 모듈 해석 방식 (Next.js 권장)
     "moduleResolution": "bundler",
+
+    // JSON 모듈 import 가능
     "resolveJsonModule": true,
+
+    // 모듈 격리 활성화 (컴파일 속도 향상)
     "isolatedModules": true,
+
+    // JSX 코드를 변환하지 않고 보존
     "jsx": "preserve",
+
+    // 증분 컴파일 활성화
     "incremental": true,
+
+    // Next.js 플러그인 설정
     "plugins": [
       {
         "name": "next"
       }
     ],
+
+    // 경로 별칭 설정
     "paths": {
+      // 프로젝트 루트의 모든 폴더/파일에 대해 @/로 접근 가능
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+
+  // 타입스크립트 컴파일 대상 포함 경로
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+
+  // 제외할 폴더
   "exclude": ["node_modules"]
 }

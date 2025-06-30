@@ -1,6 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 
+// Tailwind 다크모드는 'class' 기반으로 동작하도록 설정
 const defaultConfig = {
+  darkMode: 'class', // 'class'로 설정해야 'dark' 클래스가 적용될 때 다크모드 스타일 활성화됨
+
+  /*
+  darkMode: 'class' 추가 → Tailwind가 dark 클래스를 감지해서 다크모드 스타일 활성화
+  darkMode: 'media'와 다르게, 직접 class="dark"를 붙여야 다크모드 적용
+  클라이언트 컴포넌트에서 document.documentElement.classList.add('dark')로 다크모드 토글 시 동작함
+  */
+
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
