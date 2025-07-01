@@ -48,4 +48,9 @@ public class HackerNewsController {
             return "저장 실패: " + e.getMessage();
         }
     }
+
+    @GetMapping("/health")
+    public String healthCheck() {
+        return hackerNewsService.healthHeackerNews();
+    }
 }

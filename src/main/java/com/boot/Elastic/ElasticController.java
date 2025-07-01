@@ -148,7 +148,7 @@ public class ElasticController {
 
 
         SearchRequest request = SearchRequest.of(s -> s
-                        .index(indexName)  // 정확한 인덱스로 고정하는 것이 더 안전
+                        .index(indexName)  // 정확한 인덱스로 고정
                         .from(from) // 'from' 값으로 페이징 시작 위치 지정
                         .size(20)
                         .query(q -> {
@@ -211,7 +211,7 @@ public class ElasticController {
                 .map(hit -> (Map<String, Object>) hit.source())
                 .collect(Collectors.toList());
 
-        // 응답에 결과 + 전체 개수 같이 보내기 (Map이나 DTO로 감싸서)
+        // 응답에 결과 + 전체 개수 같이 보내기 (Map)
         return Map.of(
                 "results", hits,
                 "total", total

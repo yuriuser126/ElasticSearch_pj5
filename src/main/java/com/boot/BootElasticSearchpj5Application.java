@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @MapperScan(basePackages = "com.boot.z_config.socialLogin")
+@EnableScheduling
 public class BootElasticSearchpj5Application {
 
 	public static void main(String[] args) {
