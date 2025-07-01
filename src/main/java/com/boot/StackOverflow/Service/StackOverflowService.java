@@ -2,13 +2,17 @@ package com.boot.StackOverflow.Service;
 
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,7 +28,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-
+@Slf4j
 @Service
 public class StackOverflowService {
     @Value("${stackoverflow.apiKey}")
@@ -160,6 +164,74 @@ public class StackOverflowService {
         }
     }
 
-    
+    public String checkStackOverflowHealth() {
+        try{
+            String url = "https://api.stackexchange.com/2.3/questions"
+                    + "?order=desc"
+                    + "&sort=activity"
+                    + "&site=stackoverflow"
+                    + "&pagesize=1"
+                    + "&key=" + apiKey;
+
+            URL stack_url = new URL(url);
+            HttpURLConnection conn = (HttpURLConnection) stack_url.openConnection();
+            conn.setConnectTimeout(2000); // 2초
+            conn.setReadTimeout(2000);
+            conn.setRequestMethod("GET");
+            int responseCode = conn.getResponseCode();
+            if (responseCode >= 200 && responseCode < 400) {
+                return "UP";
+            }
+            else{
+                return "DOWN";
+            }
+        }
+        catch(Exception e){
+            return "DOWN";
+        }
+    }
+
+//    @Scheduled(fixedRate = 1000 * 60 * 60 * 24) // 하루마다
+//    @Scheduled(fixedRate = 5000) // 테스트용
+    public void saveQuestionsToMongo() {
+        String keyword = "python";
+        int limit = 10;
+        String url = "https://api.stackexchange.com/2.3/questions"
+                + "?order=desc"
+                + "&sort=activity"
+                + "&site=stackoverflow"
+                + "&pagesize=" + limit
+                + "&tagged=" + keyword
+                + "&key=" + apiKey
+                + "&filter=withbody";
+
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+
+        Map<String, Object> result = response.getBody();
+
+        if (result == null) return;
+
+        List<Map<String, Object>> items = (List<Map<String, Object>>) result.get("items");
+
+        if (items != null && !items.isEmpty()) {
+            List<StackRedditQuestion> questions = items.stream().map(item -> {
+                StackRedditQuestion q = new StackRedditQuestion();
+                q.setTitle((String) item.get("title"));
+                q.setBody((String) item.get("body"));
+                Map<String, Object> owner = (Map<String, Object>) item.get("owner");
+                q.setAuthor(owner != null ? (String) owner.get("display_name") : "StackOverflow");
+                q.setLink((String) item.get("link"));
+                q.setTags((List<String>) item.get("tags"));
+                return q;
+            }).collect(Collectors.toList());
+
+            StackRedditQuestionRepository.saveAll(questions);
+        }
+    }
 
 }

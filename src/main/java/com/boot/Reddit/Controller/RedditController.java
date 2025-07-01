@@ -6,6 +6,7 @@ import com.boot.Reddit.Service.RedditService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 @RestController
@@ -45,5 +46,10 @@ public class RedditController {
             e.printStackTrace();
             return "오류 발생: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/health")
+    public String healthCheckReddit() throws MalformedURLException {
+        return redditService.checkRedditHealth();
     }
 }

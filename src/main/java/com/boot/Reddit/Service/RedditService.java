@@ -1,6 +1,9 @@
 package com.boot.Reddit.Service;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -224,5 +228,74 @@ public class RedditService {
 
         StackRedditQuestionRepository.saveAll(questions);
     }
+
+    // reddit 상태 체크 함수
+    public String checkRedditHealth() throws MalformedURLException {
+        // 토큰 발급받기
+        String token = getAccessToken();
+        String subreddit="java";
+        String limit ="1";
+        String url = "https://oauth.reddit.com/r/" + subreddit + "/hot.json?limit=" + limit;
+
+        URL redditURL = new URL(url);
+        try {
+        		HttpURLConnection conn = (HttpURLConnection) redditURL.openConnection();
+                conn.setConnectTimeout(2000);
+                conn.setReadTimeout(2000);
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Authorization", "Bearer " + token);
+//            conn.setRequestProperty("User-Agent", "MyRedditApp/1.0 (by u/userAgent)");
+                conn.setRequestProperty("User-Agent", "MyRedditApp/1.0 userAgent");
+                int responseCode = conn.getResponseCode();
+            System.out.println("Reddit API response code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                    return "UP";
+                }
+                else {
+                    return "DOWN";
+                }
+
+        } catch (IOException e) {
+            return "DOWN";
+        }
+    }
+
+//    @Scheduled(fixedRate = 1000 * 60 * 60 * 24) // 하루마다 실행
+//    @Scheduled(fixedRate = 5000) // 테스트용
+    public void schedule() {
+        String keyword = "news";
+        int limit = 10;
+        Map<String, Object> response = fetchHotPosts(keyword, limit);
+        if (response == null) return;
+
+        Map<String, Object> data = (Map<String, Object>) response.get("data");
+        List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
+        if (children == null || children.isEmpty()) return;
+
+        List<StackRedditQuestion> questions = children.stream().map(child -> {
+            Map<String, Object> postData = (Map<String, Object>) child.get("data");
+            StackRedditQuestion q = new StackRedditQuestion();
+            q.setTitle((String) postData.get("title"));
+
+            // body 처리 및 길이 제한 적용
+            String body = Optional.ofNullable((String) postData.get("selftext"))
+                    .filter(s -> !s.trim().isEmpty())
+                    .orElse("“자세한 내용은 원문 사이트에서 확인하세요”");
+            if (body.length() > 1000) {
+                body = body.substring(0, 1000) + "...";
+            }
+            q.setBody(body);// Reddit 본문 필드명
+
+            q.setAuthor((String) postData.get("author"));
+            q.setLink("https://reddit.com" + postData.get("permalink"));
+            q.setTags(null); // Reddit은 태그가 없으므로 null 처리하거나 다른 방법으로 설정 가능
+            q.setSource("Reddit");
+            return q;
+        }).collect(Collectors.toList());
+
+        StackRedditQuestionRepository.saveAll(questions);
+    }
+
 }
 

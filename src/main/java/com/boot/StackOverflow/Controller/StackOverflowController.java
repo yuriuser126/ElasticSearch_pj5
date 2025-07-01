@@ -47,4 +47,11 @@ public class StackOverflowController {
     	        return "오류 발생: " + e.getMessage();
     	    }
     	}
+
+        @Operation(summary = "StackOverflow 상태 체크", description = "StackOverflow 응답 상태가 올바른지 확인합니다.")
+        @GetMapping("/health/stackoverflow")
+        public String healthCheckStackOverflow() {
+            // return으로 UP, DOWN을 받음
+            return stackOverflowService.checkStackOverflowHealth();
+        }
     }
