@@ -110,7 +110,10 @@ public class ElasticController {
             //String correctedQuery = correctKoreanTypo(query);
 //            query = query + " " + category;
             // 서비스 단에서 번역 수행
-            searchQuery = elasticService.translate(query);
+            
+            //임시
+         searchQuery = elasticService.translate(query);
+           
 
             log.info("번역된 쿼리: {}", searchQuery);
             log.info("category: {}", category);

@@ -6,6 +6,6 @@
 	<mappers>
 		<mapper resource="mybatis/mappers/userMapper.xml"/>
 		<mapper resource="mybatis/mappers/SocialUserMapper.xml"/>
-		
+
 	</mappers>
 </configuration>
