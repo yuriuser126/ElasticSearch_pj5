@@ -3,6 +3,8 @@ package com.boot.HackerNews.Service;
 
 import com.boot.HackerNews.DTO.HackerNewsItem;
 import com.boot.HackerNews.Repository.HackerNewsRepository;
+import com.boot.log.model.Logs;
+import com.boot.log.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import com.boot.Elastic.ElasticService;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +30,8 @@ public class HackerNewsService {
     // Elasticsearch 저장용 서비스 주입
     @Autowired
     private ElasticService elasticService;
+    @Autowired
+    private LogService logService;
 
     public List<HackerNewsItem> getTopStories(int count) {
         // 1. 인기글 ID 목록 조회
@@ -52,9 +57,31 @@ public class HackerNewsService {
 
     public void saveToMongo() {
         int count = 10; // 10개 저장
-        List<HackerNewsItem> topStories = getTopStories(count);
-        hackerNewsRepository.saveAll(topStories);
-        System.out.println("자동으로 Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
+
+        Logs log = new Logs();
+        log.setActivityType("SCHEDULED_TASK");
+        log.setActorType("SYSTEM");
+        log.setActorId("system1");
+        log.setActorName("JungJaeYun"); // 추후에 수정예정
+
+        log.setAction("HackerNewsAPI");
+        try{
+            List<HackerNewsItem> topStories = getTopStories(count);
+            hackerNewsRepository.saveAll(topStories);
+            log.setActionStatus("SUCCESS");
+            log.setActionDetail("SUCCESS: 자동으로 Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
+            System.out.println("자동으로 Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
+        }
+        catch (Exception e) {
+            log.setActionStatus("FAIL");
+            log.setActionDetail("FAIL: Hacker News 인기글 " + count + "개를 MongoDB에 저장하는 중 오류가 발생했습니다."
+                    + e.getClass().getSimpleName() + " - " + e.getMessage());
+            System.out.println("Hacker News 인기글 " + count + "개를 MongoDB에 저장하는 중 오류가 발생했습니다.");
+        }
+        finally {
+            log.setTimestamp(LocalDateTime.now());
+            logService.saveLog(log);
+        }
     }
 
     public String healthHeackerNews() {

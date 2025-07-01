@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.boot.log.model.Logs;
+import com.boot.log.service.LogService;
 import org.springframework.http.HttpEntity;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +61,10 @@ public class RedditService {
 
     // 외부 API 요청 도구
     private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private LogService logService;
 
-    
+
     /**
      * 1. Reddit API에 OAuth2 방식으로 Access Token 요청
      * -> client_id, client_secret로 인증
@@ -264,37 +269,64 @@ public class RedditService {
 //    @Scheduled(fixedRate = 1000 * 60 * 60 * 24) // 하루마다 실행
 //    @Scheduled(fixedRate = 5000) // 테스트용
     public void schedule() {
-        String keyword = "news";
-        int limit = 10;
-        Map<String, Object> response = fetchHotPosts(keyword, limit);
-        if (response == null) return;
-
-        Map<String, Object> data = (Map<String, Object>) response.get("data");
-        List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
-        if (children == null || children.isEmpty()) return;
-
-        List<StackRedditQuestion> questions = children.stream().map(child -> {
-            Map<String, Object> postData = (Map<String, Object>) child.get("data");
-            StackRedditQuestion q = new StackRedditQuestion();
-            q.setTitle((String) postData.get("title"));
-
-            // body 처리 및 길이 제한 적용
-            String body = Optional.ofNullable((String) postData.get("selftext"))
-                    .filter(s -> !s.trim().isEmpty())
-                    .orElse("“자세한 내용은 원문 사이트에서 확인하세요”");
-            if (body.length() > 1000) {
-                body = body.substring(0, 1000) + "...";
+        Logs log = new Logs();
+        log.setActivityType("SCHEDULED_TASK");
+        log.setActorType("SYSTEM");
+        log.setActorId("system1");
+        log.setActorName("JungJaeYun");
+        log.setAction("RedditAPI");
+        log.setTimestamp(LocalDateTime.now());
+        try {
+            String keyword = "news";
+            int limit = 10;
+            Map<String, Object> response = fetchHotPosts(keyword, limit);
+            if (response == null) {
+                log.setActionDetail("FAIL: fetchHotPosts 반환값이 null입니다.");
+                return;
             }
-            q.setBody(body);// Reddit 본문 필드명
 
-            q.setAuthor((String) postData.get("author"));
-            q.setLink("https://reddit.com" + postData.get("permalink"));
-            q.setTags(null); // Reddit은 태그가 없으므로 null 처리하거나 다른 방법으로 설정 가능
-            q.setSource("Reddit");
-            return q;
-        }).collect(Collectors.toList());
 
-        StackRedditQuestionRepository.saveAll(questions);
+            Map<String, Object> data = (Map<String, Object>) response.get("data");
+            List<Map<String, Object>> children = (List<Map<String, Object>>) data.get("children");
+            if (children == null || children.isEmpty()) {
+                log.setActionDetail("FAIL: children 데이터가 비어있습니다.");
+                return;
+            }
+
+            List<StackRedditQuestion> questions = children.stream().map(child -> {
+                Map<String, Object> postData = (Map<String, Object>) child.get("data");
+                StackRedditQuestion q = new StackRedditQuestion();
+                q.setTitle((String) postData.get("title"));
+
+                // body 처리 및 길이 제한 적용
+                String body = Optional.ofNullable((String) postData.get("selftext"))
+                        .filter(s -> !s.trim().isEmpty())
+                        .orElse("“자세한 내용은 원문 사이트에서 확인하세요”");
+                if (body.length() > 1000) {
+                    body = body.substring(0, 1000) + "...";
+                }
+                q.setBody(body);// Reddit 본문 필드명
+
+                q.setAuthor((String) postData.get("author"));
+                q.setLink("https://reddit.com" + postData.get("permalink"));
+                q.setTags(null); // Reddit은 태그가 없으므로 null 처리하거나 다른 방법으로 설정 가능
+                q.setSource("Reddit");
+                return q;
+            }).collect(Collectors.toList());
+
+            StackRedditQuestionRepository.saveAll(questions);
+            log.setActionStatus("SUCCESS");
+            log.setActionDetail("SUCCESS: Reddit 인기글 " + limit + "개를 MongoDB에 저장했습니다.");
+        }
+        catch (Exception e) {
+            log.setActionStatus("FAIL");
+            log.setActionDetail("FAIL: Reddit 인기글을 MongoDB에 저장하는 중 오류가 발생했습니다."
+                    + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+        finally {
+            log.setTimestamp(LocalDateTime.now());
+            logService.saveLog(log);
+        }
     }
 
 }

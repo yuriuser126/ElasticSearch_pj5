@@ -16,6 +16,7 @@ public class Logs {
     private String actorId;
     private String actorName;
     private String action;
+    private String actionStatus;
     private String actionDetail;
     private LocalDateTime timestamp;
 }

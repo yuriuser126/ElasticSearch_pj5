@@ -6,12 +6,18 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
 import co.elastic.clients.elasticsearch.core.*;
+
+import com.boot.log.model.Logs;
+import com.boot.log.service.LogService;
+import com.boot.z_config.security.PrincipalDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +58,8 @@ public class ElasticController {
 
     @Autowired
     private ElasticService elasticService;
+    @Autowired
+    private LogService logService;
 
 
     @Operation(summary = "문서 추가", description = "my_index 인덱스에 새 문서를 추가합니다.")
@@ -91,34 +99,52 @@ public class ElasticController {
     	@RequestParam(name = "size", defaultValue = "10") int size,
          @RequestParam(name = "category", required = false) String category,
          @RequestParam(name = "format", required = false) String format,
-         @RequestParam(name = "sortBy", required = false) String sortBy
-
+         @RequestParam(name = "sortBy", required = false) String sortBy,
+         Authentication authentication
     	) throws Exception {
-    	ElasticsearchClient client = elasticConfig.getClient();
+        Logs logs = new Logs();
+        logs.setActivityType("SEARCH");
+        logs.setAction("getOrSearchQuestions");
+        logs.setTimestamp(LocalDateTime.now());
 
-    	int from = (page - 1) * size;
-
-        String searchQuery;
-        String searchCategory;
-        if (query != null && !query.isEmpty()) {
-            if(category != null && !category.isEmpty()) {
-                query = query + " " + category;
-            }
-            else {
-                query = query;
-            }
-            //String correctedQuery = correctKoreanTypo(query);
-//            query = query + " " + category;
-            // 서비스 단에서 번역 수행
-            searchQuery = elasticService.translate(query);
-
-            log.info("번역된 쿼리: {}", searchQuery);
-            log.info("category: {}", category);
-            log.info("format: {}", format);
-            log.info("sortBy: {}", sortBy);
+        // 인증 정보에서 유저 정보 추출
+        if (authentication != null && authentication.isAuthenticated() &&
+                authentication.getPrincipal() instanceof PrincipalDetails) {
+            PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+            logs.setActorType("USER");
+            logs.setActorId(principal.getUser().getUserId());
+            logs.setActorName(principal.getUser().getUserName());
         } else {
-            searchQuery = query;
+            logs.setActorType("ANONYMOUS");
+            logs.setActorId("anonymous");
+            logs.setActorName("anonymous");
         }
+
+        try {
+            ElasticsearchClient client = elasticConfig.getClient();
+
+            int from = (page - 1) * size;
+
+            String searchQuery;
+            String searchCategory;
+            if (query != null && !query.isEmpty()) {
+                if (category != null && !category.isEmpty()) {
+                    query = query + " " + category;
+                } else {
+                    query = query;
+                }
+                //String correctedQuery = correctKoreanTypo(query);
+//            query = query + " " + category;
+                // 서비스 단에서 번역 수행
+                searchQuery = elasticService.translate(query);
+
+                log.info("번역된 쿼리: {}", searchQuery);
+                log.info("category: {}", category);
+                log.info("format: {}", format);
+                log.info("sortBy: {}", sortBy);
+            } else {
+                searchQuery = query;
+            }
 //        if(category != null && !category.isEmpty()) {
 //            searchCategory = elasticService.translate(category);
 //        }
@@ -126,45 +152,43 @@ public class ElasticController {
 //            searchCategory = category;
 //        }
 
-        String indexName;
-        if(format != null && !format.isEmpty()) {
-            if ("stackoverflow".equals(format)) {
-                indexName = "mydb.stackoverflowquestions";
-            } else if ("reddit".equals(format)) {
-                indexName = "mydb.redditquestions";
-            } else if ("hackernews".equals(format)) {
-                indexName = "mydb.hackernews";
+            String indexName;
+            if (format != null && !format.isEmpty()) {
+                if ("stackoverflow".equals(format)) {
+                    indexName = "mydb.stackoverflowquestions";
+                } else if ("reddit".equals(format)) {
+                    indexName = "mydb.redditquestions";
+                } else if ("hackernews".equals(format)) {
+                    indexName = "mydb.hackernews";
+                } else {
+                    indexName = "mydb.*";
+                }
             } else {
                 indexName = "mydb.*";
             }
-        }
-        else {
-            indexName = "mydb.*";
-        }
 
 
+            SearchRequest request = SearchRequest.of(s -> s
+                            .index(indexName)  // 정확한 인덱스로 고정
+                            .from(from) // 'from' 값으로 페이징 시작 위치 지정
+                            .size(20)
+                            .query(q -> {
+                                if (searchQuery == null || searchQuery.isEmpty()) {
+                                    log.info("elastic controller : " + searchQuery);
+                                    return q.matchAll(m -> m);
+                                } else {
+                                    log.info("elastic controller2 : " + searchQuery);
+                                    return q.bool(b -> b
+                                                    .should(m -> m.multiMatch(mm -> mm
+                                                            .fields("title^5", "body^2", "tags")
+                                                            .query(searchQuery)
+                                                            .type(TextQueryType.BestFields)
+                                                            .fuzziness("AUTO")
+                                                            .operator(Operator.Or)
+                                                            .minimumShouldMatch("70%")
 
-        SearchRequest request = SearchRequest.of(s -> s
-                        .index(indexName)  // 정확한 인덱스로 고정
-                        .from(from) // 'from' 값으로 페이징 시작 위치 지정
-                        .size(20)
-                        .query(q -> {
-                            if (searchQuery == null || searchQuery.isEmpty()) {
-                                log.info("elastic controller : " + searchQuery);
-                                return q.matchAll(m -> m);
-                            } else {
-                                log.info("elastic controller2 : " + searchQuery);
-                                return q.bool(b -> b
-                                                .should(m -> m.multiMatch(mm -> mm
-                                                        .fields("title^5", "body^2", "tags")
-                                                        .query(searchQuery)
-                                                        .type(TextQueryType.BestFields)
-                                                        .fuzziness("AUTO")
-                                                        .operator(Operator.Or)
-                                                        .minimumShouldMatch("70%")
-
-                                                ))
-                                        // 카테고리 필터링 추가 - 검색 정확도는 높아지지만 데이터셋 부족으로 사용 x
+                                                    ))
+                                            // 카테고리 필터링 추가 - 검색 정확도는 높아지지만 데이터셋 부족으로 사용 x
 //                                .filter(f -> {
 //                                    if (searchCategory != null && !searchCategory.isEmpty()) {
 //
@@ -173,46 +197,62 @@ public class ElasticController {
 //                                        return null; // 필터 없음
 //                                    }
 //                                })
-                                );
-                            }
-                        })
-                        // 하이라이트 <em> 태그 붙어서 나옴
-                        .highlight(h -> h
-                                .fields("title", f -> f)
-                                .fields("body", f -> f)
-                                .fields("tags", f -> f)
-                        )
+                                    );
+                                }
+                            })
+                            // 하이라이트 <em> 태그 붙어서 나옴
+                            .highlight(h -> h
+                                    .fields("title", f -> f)
+                                    .fields("body", f -> f)
+                                    .fields("tags", f -> f)
+                            )
 
-                        // 정렬 조건
-                        .sort(sortBuilder -> {
-                            if ("date".equals(sortBy)) {
-                                return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
-                            } else if ("popularity".equals(sortBy)) {
-                                return sortBuilder.field(f -> f.field("view_count").order(SortOrder.Desc));
-                            } else if ("relevance".equals(sortBy)) {
-                                return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
-                            } else {
-                                // 기본 정렬 조건 (예: _score 내림차순)
-                                return sortBuilder.field(f -> f.field("_score").order(SortOrder.Desc));
-                            }
-                        })
-        );
+                            // 정렬 조건
+                            .sort(sortBuilder -> {
+                                if ("date".equals(sortBy)) {
+                                    return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
+                                } else if ("popularity".equals(sortBy)) {
+                                    return sortBuilder.field(f -> f.field("view_count").order(SortOrder.Desc));
+                                } else if ("relevance".equals(sortBy)) {
+                                    return sortBuilder.field(f -> f.field("score").order(SortOrder.Desc));
+                                } else {
+                                    // 기본 정렬 조건 (예: _score 내림차순)
+                                    return sortBuilder.field(f -> f.field("_score").order(SortOrder.Desc));
+                                }
+                            })
+            );
 
-        SearchResponse<Map> response = client.search(request, Map.class);
+            SearchResponse<Map> response = client.search(request, Map.class);
 
-        // 총 검색 결과 개수
-        long total = response.hits().total().value();
+            // 총 검색 결과 개수
+            long total = response.hits().total().value();
 
-        // 검색 결과 리스트
-        List<Map<String, Object>> hits = response.hits().hits().stream()
-                .map(hit -> (Map<String, Object>) hit.source())
-                .collect(Collectors.toList());
+            // 검색 결과 리스트
+            List<Map<String, Object>> hits = response.hits().hits().stream()
+                    .map(hit -> (Map<String, Object>) hit.source())
+                    .collect(Collectors.toList());
+            logs.setActionStatus("SUCCESS");
+            logs.setActionDetail("SUCCESS: query=" + query + ", category=" + category +
+                    ", format=" + format + ", sortBy=" + sortBy +
+                    ", 결과 개수=" + total);
 
-        // 응답에 결과 + 전체 개수 같이 보내기 (Map)
-        return Map.of(
-                "results", hits,
-                "total", total
-        );
+            // 응답에 결과 + 전체 개수 같이 보내기 (Map)
+            return Map.of(
+                    "results", hits,
+                    "total", total
+            );
+        }
+        catch (Exception e) {
+            logs.setActionStatus("FAIL");
+            logs.setActionDetail("FAIL: query=" + query + ", category=" + category +
+                    ", format=" + format + ", sortBy=" + sortBy + ", error=" + e.getMessage());
+            throw e;
+        }
+        finally {
+            // 로그 저장
+            logs.setTimestamp(LocalDateTime.now());
+            logService.saveLog(logs);
+        }
     }
 
     public String stripHtmlTags(String html) {

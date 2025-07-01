@@ -255,7 +255,7 @@ public class JwtTokenUtil {
             }
             
             String userId = claims.getSubject();
-            
+
             // 데이터베이스에서 사용자 정보 조회
             HashMap<String, String> param = new HashMap<>();
             param.put("userId", userId);

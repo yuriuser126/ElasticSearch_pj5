@@ -169,6 +169,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({ result, onSwaggerCl
                     },
                     body: JSON.stringify({
                       userId: user.userId,     // 서버에서 받은 사용자 ID
+                      userName: user.userName,
                       documentId: result.id,   // 현재 카드의 문서 ID
                       title: result.title,
                       url: result.url,

@@ -287,6 +287,7 @@ const HistoryPage: React.FC = () => {
                                                                 },
                                                                 body: JSON.stringify({
                                                                     userId: user.userId, // 로그인 사용자 ID
+                                                                    userName: user.userName, // 로그인 사용자 이름
                                                                     title: item.datasetName, // 현재 행의 datasetName을 TITLE로 사용
                                                                 }),
                                                             });

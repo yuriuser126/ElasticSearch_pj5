@@ -26,7 +26,7 @@ public class LogService {
         }
         return log;
     }
-    public List<Logs> findAllLog() {
+    public List<Logs> findAllLogs() {
         return logRepository.findAll();
     }
 }

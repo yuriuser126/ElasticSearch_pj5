@@ -34,7 +34,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @PostConstruct
     public void init() {
         // 초기 cron 설정
-        currentCron = "0/10 * * * * *"; // 10초마다 실행
+//        currentCron = "0/10 * * * * *"; // 10초마다 실행
+        currentCron = "0 0/30 * * * ?"; // 30분마다 실행
         schedule(currentCron);
     }
 

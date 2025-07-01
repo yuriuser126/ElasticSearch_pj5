@@ -87,6 +87,7 @@ export const useCollectionHistory = () => {
         method: "GET",
         credentials: "include", // 인증 필요시
         headers: { "Content-Type": "application/json" }
+
       });
       const data = await res.json();
       setHistory(data);

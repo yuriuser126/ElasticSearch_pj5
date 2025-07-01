@@ -4,11 +4,14 @@ package com.boot.StackOverflow.Service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.boot.log.model.Logs;
+import com.boot.log.service.LogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,7 +43,9 @@ public class StackOverflowService {
     @Autowired
     private StackRedditQuestionRepository StackRedditQuestionRepository;  // ✅ 통합 저장소
     @Autowired
-    private StackOverflowQuestionRepository repository;  
+    private StackOverflowQuestionRepository repository;
+    @Autowired
+    private LogService logService;
 
    
 
@@ -194,6 +199,13 @@ public class StackOverflowService {
 //    @Scheduled(fixedRate = 1000 * 60 * 60 * 24) // 하루마다
 //    @Scheduled(fixedRate = 5000) // 테스트용
     public void saveQuestionsToMongo() {
+        Logs log = new Logs();
+        log.setActivityType("SCHEDULED_TASK");
+        log.setActorType("SYSTEM");
+        log.setActorId("system1");
+        log.setActorName("JungJaeYun");
+        log.setAction("StackOverflowAPI");
+        log.setTimestamp(LocalDateTime.now());
         String keyword = "python";
         int limit = 10;
         String url = "https://api.stackexchange.com/2.3/questions"
@@ -204,6 +216,10 @@ public class StackOverflowService {
                 + "&tagged=" + keyword
                 + "&key=" + apiKey
                 + "&filter=withbody";
+
+        try{
+
+
 
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 url,
@@ -231,6 +247,17 @@ public class StackOverflowService {
             }).collect(Collectors.toList());
 
             StackRedditQuestionRepository.saveAll(questions);
+            log.setActionStatus("SUCCESS");
+            log.setActionDetail("SUCCESS: StackOverflow에서 '" + keyword + "' 인기 질문 " + questions.size() + "개를 저장했습니다.");        }
+        }
+        catch (Exception e) {
+            log.setActionStatus("FAIL");
+            log.setActionDetail("FAIL: StackOverflow 인기글 " + limit + "개를 MongoDB에 저장하는 중 오류가 발생했습니다."
+                    + e.getClass().getSimpleName() + " - " + e.getMessage());
+        }
+        finally {
+            log.setTimestamp(LocalDateTime.now());
+            logService.saveLog(log);
         }
     }
 
