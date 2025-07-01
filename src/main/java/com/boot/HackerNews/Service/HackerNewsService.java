@@ -49,9 +49,9 @@ public class HackerNewsService {
         System.out.println("Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
     }
 
-    @Scheduled(fixedRate = 10000)
+
     public void saveToMongo() {
-        int count = 10; // 자동으로 저장할 개수 설정
+        int count = 10; // 10개 저장
         List<HackerNewsItem> topStories = getTopStories(count);
         hackerNewsRepository.saveAll(topStories);
         System.out.println("자동으로 Hacker News 인기글 " + count + "개를 MongoDB에 저장했습니다.");
